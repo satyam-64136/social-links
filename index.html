@@ -254,6 +254,47 @@
           transform: scaleX(0.7);
         }
       }
+@media (max-width: 400px) {
+  .wrapper {
+    width: 100%;
+    padding: 10px;
+    transform: none; /* Reset translation for small screens */
+    top: 0;
+    left: 0;
+    position: relative;
+  }
+
+  .container {
+    width: 100%;
+    height: auto;
+  }
+
+  .cat {
+    right: 10px;
+    bottom: 40px;
+  }
+
+  .body {
+    height: 70px;
+    width: 120px;
+    right: 40px;
+  }
+
+  .tail {
+    width: 80px;
+    right: 120px;
+  }
+
+  .shadow {
+    width: 180px;
+    left: 50px;
+  }
+
+  a {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
 
             }
     </style>
