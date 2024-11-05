@@ -2,8 +2,8 @@
 
 A personalized LinkTree-inspired webpage with a playful "Sleepy Cat" theme and an interactive particle background. This page links to my social media profiles, offering a unique visual experience with animated stars and a sleepy cat graphic.
 
-- **Access Link**: [**Click here**](https://satyam-64136.github.io/social-links)
-- **Older Files**: [**Click here**](https://satyam-64136.github.io/social-links/old%20files/social-links-old.html)
+-  [**Access Link**:](https://satyam-64136.github.io/social-links)
+-  [**Older Files**:](https://satyam-64136.github.io/social-links/old%20files/social-links-old.html)
 
 ## Features
 
