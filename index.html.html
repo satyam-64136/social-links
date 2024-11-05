@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sleepy Cat with Particle Background</title>
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
+        <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+        <!-- Boxicons CSS -->
+        <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    </head>
+    
+<body>
+
+<style>
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+}
+
+.particle-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.star {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 20%;
+    opacity: 0.7;
+    width: 2px;
+    height: 2px;
+    box-shadow: 0 0 8px 4px rgba(190, 190, 190, 0.253);
+}
+
+:root {
+    --shadows-small: 1400px 1000px #FFF, 500px 600px #FFF, 600px 1200px #FFF;
+    --shadows-medium: 1200px 700px #FFF, 800px 500px #FFF, 900px 900px #FFF;
+    --shadows-big: 1000px 300px #FFF, 400px 200px #FFF, 600px 100px #FFF;
+}
+
+.wrapper {
+    width: 350px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+}
+
+.container {
+    height: 200px;
+    width: 100%;
+    position: relative;
+}
+
+a {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 10px; 
+    padding: 15px 0;
+    text-decoration: none;
+    color: #ffffff;
+    font-family: "Poppins", sans-serif;
+    font-size: 16px; 
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-top: 30px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.644), 0 2px 4px rgba(0, 0, 0, 0.575); 
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(66, 66, 66, 0.1));
+    opacity: 0;
+    animation: fadeIn 3s ease-out forwards;
+}
+
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(-20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+a:hover {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 18px rgba(255, 255, 255, 0.6), 0 0 24px rgba(255, 255, 255, 0.4);
+}
+
+.cat {
+    background-color: #f19b1a;
+    height: 65px;
+    width: 80px;
+    border-radius: 0 80px 80px 0;
+    position: absolute;
+    bottom: 60px;
+    right: 50px;
+}
+
+.ear {
+    height: 15px;
+    width: 15px;
+    background-color: #f19b1a;
+    position: absolute;
+    bottom: 64px;
+    left: 8px;
+    border-radius: 20px 0 0 0;
+    box-shadow: 25px 0 #f19b1a;
+}
+
+.eye, .eye:before {
+    height: 7px;
+    width: 10px;
+    border-radius: 0 0 15px 15px;
+    border: 2px solid #2c2c2c;
+    border-top: none;
+    position: absolute;
+}
+
+.eye { top: 18px; left: 15px; }
+.eye:before { content: ""; left: 30px; }
+
+.nose {
+    background-color: white;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    position: absolute;
+    top: 32px;
+    left: 25px;
+    box-shadow: 12px 0 white;
+}
+
+.mouth {
+    background-color: #2c2c2c;
+    height: 15px;
+    width: 17px;
+    position: absolute;
+    border-radius: 0 0 5px 5px;
+    top: 38px;
+    left: 27px;
+    animation: mouth 2s infinite;
+    transform-origin: top;
+}
+
+@keyframes mouth {
+    50% { transform: scaleY(0.7); }
+}
+
+.body {
+    background-color: #f19b1a;
+    height: 90px;
+    width: 140px;
+    position: absolute;
+    right: 65px;
+    bottom: 0;
+    border-radius: 60px 60px 0 0;
+    animation: sleep 2s infinite;
+    transform-origin: bottom right;
+}
+
+@keyframes sleep {
+    50% { transform: scale(0.9, 1.05); }
+}
+
+.tail {
+    background-color: #d07219;
+    height: 20px;
+    width: 100px;
+    position: absolute;
+    right: 150px;
+    bottom: 0;
+    border-radius: 20px 0 0 20px;
+}
+
+.bubble {
+    height: 20px;
+    width: 20px;
+    background-color: rgba(255, 255, 255, 0.4);
+    position: absolute;
+    border-radius: 50px 50px 50px 5px;
+    left: 65px;
+    top: 20px;
+    animation: bubble 2s infinite;
+}
+
+@keyframes bubble {
+    50% { transform: scale(1.6); }
+}
+
+.shadow {
+    height: 10px;
+    width: 240px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    position: absolute;
+    bottom: 52px;
+    left: 70px;
+    animation: shadow 2s infinite;
+}
+
+@keyframes shadow {
+    50% { transform: scaleX(0.7); }
+}
+
+</style>
+
+<!-- Particle Background -->
+<div class="particle-background"></div>
+
+<!-- Sleepy Cat Animation and Links -->
+<div class="wrapper">
+    <div class="container">
+        <div class="shadow"></div>
+        <div class="cat">
+            <div class="ear"></div>
+            <div class="eye"></div>
+            <div class="mouth"></div>
+            <div class="nose"></div>
+            <div class="tail"></div>
+            <div class="body"></div>
+            <div class="bubble"></div>
+        </div>
+    </div>
+    <!-- Social Links with Icons -->
+    <a href="https://www.instagram.com/the_enigma_0_o" target="_blank">
+        <i class="bx bxl-instagram" style="color: rgba(255, 255, 255, 0.747); font-size: 24px;"></i>
+        Follow me on Instagram
+    </a>
+    <a href="https://www.snapchat.com/add/satyamkr0_0" target="_blank">
+        <i class="bx bxl-snapchat" style="color: rgba(255, 255, 255, 0.699); font-size: 24px;"></i>
+        Follow me on Snapchat
+    </a>
+    <a href="https://github.com/satyam-64136" target="_blank">
+        <i class="bx bxl-github" style="color: rgba(255, 255, 255, 0.747); font-size: 24px;"></i>
+        Follow me on Github
+    </a>
+    <a href="https://api.whatsapp.com/send?phone=12103197567" target="_blank">
+        <i class="bx bxl-whatsapp" style="color: rgba(255, 255, 255, 0.747); font-size: 24px;"></i>
+        Text me on Whatsapp
+    </a>
+    <a href="https://t.me/Satyam64136" target="_blank">
+        <i class="bx bxl-telegram" style="color: rgba(255, 255, 255, 0.747); font-size: 24px;"></i>
+        Text me on Telegram
+    </a>  
+</div>
+
+<script>
+// JavaScript for particle-based star background
+document.addEventListener("DOMContentLoaded", () => {
+    const particleContainer = document.querySelector(".particle-background");
+
+    // Track cursor direction
+    let lastX = window.innerWidth / 2;
+    let lastY = window.innerHeight / 2;
+    let velocityX = 0;
+    let velocityY = 0;
+    const stars = [];
+
+
+    const rows = 15; 
+    const cols = 10;  
+    const starCount = 100;  
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+
+        // Place stars in a grid pattern
+        const row = Math.floor(i / cols);
+        const col = i % cols;
+        const posX = (window.innerWidth / cols) * col + Math.random() * (window.innerWidth / cols);
+        const posY = (window.innerHeight / rows) * row + Math.random() * (window.innerHeight / rows);
+
+        star.style.left = `${posX}px`;
+        star.style.top = `${posY}px`;
+
+        stars.push({
+            element: star,
+            x: posX,
+            y: posY,
+            speed: Math.random() * 1 + 0.5,
+            driftX: (Math.random() - 0.5) * 0.5,
+            driftY: (Math.random() - 0.5) * 0.5
+        });
+
+        particleContainer.appendChild(star);
+    }
+
+
+    // Track mouse movement for star direction
+    document.addEventListener("mousemove", (e) => {
+        velocityX = e.clientX - lastX;
+        velocityY = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+    });
+    function animateStars() {
+        stars.forEach((star) => {
+            star.x += (velocityX * 0.1 + star.driftX) * star.speed;
+            star.y += (velocityY * 0.1 + star.driftY) * star.speed;
+
+            if (star.x > window.innerWidth) star.x = 0;
+            if (star.x < 0) star.x = window.innerWidth;
+            if (star.y > window.innerHeight) star.y = 0;
+            if (star.y < 0) star.y = window.innerHeight;
+
+            star.element.style.transform = `translate(${star.x}px, ${star.y}px)`;
+        });
+
+        requestAnimationFrame(animateStars);
+    }
+
+    animateStars();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sleepy Cat</title>
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Viewport meta tag for scaling on mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <style>
+      body {
+        background-color: #ddc8c8ab;
+        padding: 0;
+        margin: 0;
+      }
+
+      .wrapper {
+        width: 350px;
+        position: absolute;
+        -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+      }
+
+      .container {
+        height: 200px;
+        width: 100%;
+        position: relative;
+      }
+
+      a {
+        display: block;
+        position: relative;
+        background-color: #f19b1a;
+        color: #ffffff;
+        text-align: center;
+        font-family: "Poppins", sans-serif;
+        padding: 15px 0;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 30px;
+      }
+
+      .cat {
+        background-color: #f19b1a;
+        height: 65px;
+        width: 80px;
+        border-radius: 0 80px 80px 0;
+        position: absolute;
+        bottom: 60px;
+        right: 50px;
+      }
+
+      .ear {
+        height: 15px;
+        width: 15px;
+        background-color: #f19b1a;
+        position: absolute;
+        bottom: 64px;
+        left: 8px;
+        border-radius: 20px 0 0 0;
+        -webkit-box-shadow: 25px 0 #f19b1a;
+        box-shadow: 25px 0 #f19b1a;
+      }
+
+      .eye,
+      .eye:before {
+        height: 7px;
+        width: 10px;
+        border-radius: 0 0 15px 15px;
+        border: 2px solid #2c2c2c;
+        border-top: none;
+        position: absolute;
+      }
+
+      .eye {
+        top: 18px;
+        left: 15px;
+      }
+
+      .eye:before {
+        content: "";
+        left: 30px;
+      }
+
+      .nose {
+        background-color: white;
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        position: absolute;
+        top: 32px;
+        left: 25px;
+        -webkit-box-shadow: 12px 0 white;
+        box-shadow: 12px 0 white;
+      }
+
+      .nose:before {
+        content: "";
+        width: 12px;
+        height: 8px;
+        position: absolute;
+        left: 6px;
+        background-color: white;
+      }
+
+      .nose:after {
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        border-top: 8px solid #ef946b;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        bottom: 7px;
+        left: 6px;
+      }
+
+      .mouth {
+        background-color: #2c2c2c;
+        height: 15px;
+        width: 17px;
+        position: absolute;
+        border-radius: 0 0 5px 5px;
+        top: 38px;
+        left: 27px;
+        -webkit-animation: mouth 2s infinite;
+        animation: mouth 2s infinite;
+        -webkit-transform-origin: top;
+        -ms-transform-origin: top;
+        transform-origin: top;
+      }
+
+      @-webkit-keyframes mouth {
+        50% {
+          -webkit-transform: scaleY(0.7);
+          transform: scaleY(0.7);
+        }
+      }
+
+      @keyframes mouth {
+        50% {
+          -webkit-transform: scaleY(0.7);
+          transform: scaleY(0.7);
+        }
+      }
+
+      .body {
+        background-color: #f19b1a;
+        height: 90px;
+        width: 140px;
+        position: absolute;
+        right: 65px;
+        bottom: 0;
+        border-radius: 60px 60px 0 0;
+        -webkit-animation: sleep 2s infinite;
+        animation: sleep 2s infinite;
+        -webkit-transform-origin: bottom right;
+        -ms-transform-origin: bottom right;
+        transform-origin: bottom right;
+      }
+
+      @-webkit-keyframes sleep {
+        50% {
+          -webkit-transform: scale(0.9, 1.05);
+          transform: scale(0.9, 1.05);
+        }
+      }
+
+      @keyframes sleep {
+        50% {
+          -webkit-transform: scale(0.9, 1.05);
+          transform: scale(0.9, 1.05);
+        }
+      }
+
+      .tail {
+        background-color: #d07219;
+        height: 20px;
+        width: 100px;
+        position: absolute;
+        right: 150px;
+        bottom: 0;
+        border-radius: 20px 0 0 20px;
+      }
+
+      .body:before {
+        content: "";
+        position: absolute;
+        background-color: white;
+        height: 12px;
+        width: 30px;
+        border-radius: 6px;
+        bottom: 0;
+        left: 22px;
+        -webkit-box-shadow: 45px 0 white;
+        box-shadow: 45px 0 white;
+      }
+
+      .bubble {
+        height: 20px;
+        width: 20px;
+        background-color: rgba(255, 255, 255, 0.4);
+        position: absolute;
+        border-radius: 50px 50px 50px 5px;
+        left: 65px;
+        top: 20px;
+        -webkit-animation: bubble 2s infinite;
+        animation: bubble 2s infinite;
+      }
+
+      @-webkit-keyframes bubble {
+        50% {
+          -webkit-transform: scale(1.6);
+          transform: scale(1.6);
+        }
+      }
+
+      @keyframes bubble {
+        50% {
+          -webkit-transform: scale(1.6);
+          transform: scale(1.6);
+        }
+      }
+
+      .shadow {
+        height: 10px;
+        width: 240px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        position: absolute;
+        bottom: 52px;
+        left: 70px;
+        -webkit-animation: shadow 2s infinite;
+        animation: shadow 2s infinite;
+      }
+
+      @-webkit-keyframes shadow {
+        50% {
+          -webkit-transform: scaleX(0.7);
+          transform: scaleX(0.7);
+        }
+      }
+
+      @keyframes shadow {
+        50% {
+          -webkit-transform: scaleX(0.7);
+          transform: scaleX(0.7);
+        }
+      }
+@media (max-width: 400px) {
+  .wrapper {
+    width: 100%;
+    padding: 10px;
+    transform: none; /* Reset translation for small screens */
+    top: 0;
+    left: 0;
+    position: relative;
+  }
+
+  .container {
+    width: 100%;
+    height: auto;
+  }
+
+  .cat {
+    right: 10px;
+    bottom: 40px;
+  }
+
+  .body {
+    height: 70px;
+    width: 120px;
+    right: 40px;
+  }
+
+  .tail {
+    width: 80px;
+    right: 120px;
+  }
+
+  .shadow {
+    width: 180px;
+    left: 50px;
+  }
+
+  a {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+            }
+    </style>
+    <!-- Defining Cat's Body -->
+    <div class="wrapper">
+      <div class="container">
+        <div class="shadow"></div>
+        <div class="cat">
+          <div class="ear"></div>
+          <div class="eye"></div>
+          <div class="mouth"></div>
+          <div class="nose"></div>
+          <div class="tail"></div>
+          <div class="body"></div>
+          <div class="bubble"></div>
+        </div>
+      </div>
+      <!-- social links -->
+      <!-- INSTAGRAM -->
+      <a href="https://www.instagram.com/the_enigma_0_o" target="_blank"
+        >Follow me on Instagram.</a
+      >
+      <!-- SNAPCHAT -->
+      <a
+        href="https://www.snapchat.com/add/satyamkr0_0?sender_web_id=3fd3fbc3-4ef7-4025-9590-c4adb944180c&device_type=desktop&is_copy_url=true"
+        target="_blank"
+        >Follow me on Snapchat.</a
+      >
+      <!-- GITHUB -->
+      <a href="https://github.com/satyam-64136" target="_blank">Follow me on Github.</a>
+      <!-- WHATSAPP-->
+      <a href="https://api.whatsapp.com/send?phone=12103197567" target="_blank"
+        >Text me on Whatsapp.</a
+      >
+      <!-- TELEGRAM-->
+      <a href="https://t.me/Satyam64136" target="_blank">Text me on Telegram.</a>
+    </div>
+  </body>
+</html>
