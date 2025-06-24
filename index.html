@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
- <head>
+  <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>😼 Aalsi Billi</title>
     <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
     <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
     <!-- Boxicons CSS -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   </head>
-    
+
 <body>
 
 <style>
-
 html, body {
     height: 100%;
     margin: 0;
@@ -105,7 +105,6 @@ a:hover {
         margin-top: 15px;
     }
 }
-
 
 @keyframes fadeIn {
     0% { opacity: 0; transform: translateY(-20px); }
@@ -228,6 +227,72 @@ a:hover {
     50% { transform: scaleX(0.7); }
 }
 
+/* Popup Styles */
+.popup {
+    font-family: 'Outfit', sans-serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.popup.visible {
+    display: flex;
+    animation: fadeInPopup 0.4s ease-in-out;
+}
+
+.popup-content {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+}
+
+.popup-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.popup-description {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+}
+
+.close-btn:hover {
+    color: #ff3333;
+}
+
+@keyframes fadeInPopup {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 </style>
 
 <!-- Particle Background -->
@@ -247,11 +312,19 @@ a:hover {
             <div class="bubble"></div>
         </div>
     </div>
-    <!-- Social Links with Icons -->
     <a href="https://www.instagram.com/the_enigma_0_o" target="_blank">
         <i class="bx bxl-instagram" style="color: rgba(255, 255, 255, 0.897); font-size: 24px;"></i>
         Follow me on Instagram
     </a>
+    <!-- Popup -->
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <button class="close-btn" id="close-btn">&times;</button>
+            <h2 class="popup-title">INACTIVE HU BHAY</h2>
+            <p class="popup-description">Purana Number dispose kar diya filhaal soon firse naya Number leke aaunga😔💪</p>
+        </div>
+    </div>
+
     <a href="https://www.snapchat.com/add/satyamkr0_0" target="_blank">
         <i class="bx bxl-snapchat" style="color: rgba(255, 255, 255, 0.897); font-size: 24px;"></i>
         Follow me on Snapchat
@@ -260,17 +333,35 @@ a:hover {
         <i class="bx bxl-github" style="color: rgba(255, 255, 255, 0.897); font-size: 24px;"></i>
         Follow me on Github
     </a>
-    <a href="https://api.whatsapp.com/send?phone=66961324193&text=Hi...!Enigma%E3%84%9F(%E2%89%A7%E2%97%87%E2%89%A6)%E3%84%8F" target="_blank">
+    <a href="#" id="whatsapp-btn">
         <i class="bx bxl-whatsapp" style="color: rgba(255, 255, 255, 0.897); font-size: 24px;"></i>
         Text me on Whatsapp
     </a>
     <a href="https://t.me/Someone_ENIGMA" target="_blank">
         <i class="bx bxl-telegram" style="color: rgba(255, 255, 255, 0.897); font-size: 24px;"></i>
         Text me on Telegram
-    </a>   
+    </a>
 </div>
 
 <script>
+// Show popup when WhatsApp button is clicked
+document.getElementById('whatsapp-btn').addEventListener('click', (e) => {
+    e.preventDefault(); // Prevent default behavior
+    document.getElementById('popup').classList.add('visible');
+});
+
+// Close popup
+document.getElementById('close-btn').addEventListener('click', () => {
+    document.getElementById('popup').classList.remove('visible');
+});
+
+// Close popup by clicking outside content
+document.getElementById('popup').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        document.getElementById('popup').classList.remove('visible');
+    }
+});
+
 // JavaScript for particle-based star background
 document.addEventListener("DOMContentLoaded", () => {
     const particleContainer = document.querySelector(".particle-background");
@@ -282,10 +373,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let velocityY = 0;
     const stars = [];
 
-
-    const rows = 15; 
-    const cols = 12;  
-    const starCount = 100;  
+    const rows = 15;
+    const cols = 10;
+    const starCount = 100;
 
     for (let i = 0; i < starCount; i++) {
         const star = document.createElement("div");
@@ -312,7 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
         particleContainer.appendChild(star);
     }
 
-
     // Track mouse movement for star direction
     document.addEventListener("mousemove", (e) => {
         velocityX = e.clientX - lastX;
@@ -320,6 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
         lastX = e.clientX;
         lastY = e.clientY;
     });
+
     function animateStars() {
         stars.forEach((star) => {
             star.x += (velocityX * 0.1 + star.driftX) * star.speed;
