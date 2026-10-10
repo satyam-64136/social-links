@@ -1,0 +1,971 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Aalsi Billi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: night sky. Title top-left, a big 3D cat stage in the middle, thumb-zone link pillows at the bottom. */
+:root {
+  --ink: #120F2B;
+  --dusk: #2A2068;
+  --moon: #FFF0D2;
+  --moon-dim: rgba(255, 240, 210, 0.74);
+  --marigold: #FFAA2E;
+  --bubblegum: #FF78A8;
+  --glass-top: rgba(255, 240, 210, 0.15);
+  --glass-bottom: rgba(255, 240, 210, 0.06);
+  --glass-edge: rgba(255, 240, 210, 0.22);
+  --key-edge: #07051A;
+  --font: "Baloo 2", ui-rounded, "Nunito", system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+html { background: var(--ink); }
+body {
+  background: var(--ink);
+  color: var(--moon);
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.35;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+.sky {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(130% 58% at 50% 12%, #43318F 0%, var(--dusk) 40%, var(--ink) 100%);
+}
+
+#scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 520px;
+  margin-inline: auto;
+  padding-inline: 18px;
+  padding-block: 22px 26px;
+}
+
+/* ---------- header ---------- */
+.head h1 {
+  margin: 0;
+  font-size: clamp(2.6rem, 12vw, 3.9rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  text-shadow: 0 0 28px rgba(255, 170, 46, 0.38);
+}
+.head p {
+  margin: 0.45rem 0 0;
+  max-width: 24ch;
+  font-weight: 500;
+  font-size: 1.0625rem;
+  color: var(--moon-dim);
+}
+
+/* ---------- stage (the 3D cat is drawn behind this area) ---------- */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: clamp(210px, 32dvh, 380px);
+  touch-action: pan-y pinch-zoom;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(6rem, 34vw, 9rem);
+  line-height: 1;
+  filter: drop-shadow(0 0 28px rgba(255, 170, 46, 0.45));
+}
+.fallback.nudge { animation: nudge 0.5s ease; }
+@keyframes nudge {
+  25% { transform: rotate(-8deg) scale(1.06); }
+  60% { transform: rotate(6deg) scale(1.04); }
+}
+
+.bubble {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: 78%;
+  padding: 0.5rem 0.9rem;
+  border-radius: 18px;
+  background: var(--moon);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.25;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.6;
+  transform-origin: 50% 100%;
+  transition: opacity 0.15s ease, scale 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  background: var(--moon);
+  border-radius: 3px;
+  rotate: 45deg;
+  z-index: -1;
+}
+.bubble.show { opacity: 1; scale: 1; }
+
+/* ---------- wake button ---------- */
+.wake {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 48px;
+  margin-bottom: 16px;
+  padding: 0.45rem 1.2rem;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
+  color: var(--moon);
+  font: 700 1.0625rem/1 var(--font);
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 3px 0 var(--key-edge);
+  transition: translate 0.12s ease, box-shadow 0.12s ease;
+}
+.wake:active { translate: 0 2px; box-shadow: 0 1px 0 var(--key-edge); }
+.wake:focus-visible, .pillow:focus-visible, .ok:focus-visible {
+  outline: 3px solid var(--marigold);
+  outline-offset: 3px;
+}
+.wake .paw { display: inline-block; animation: tap-hint 1.6s ease-in-out infinite; }
+.wake.used .paw { animation: none; }
+@keyframes tap-hint {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -5px; }
+}
+
+/* ---------- link pillows ---------- */
+.links {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.links li { animation: rise 0.6s cubic-bezier(0.2, 0.8, 0.3, 1) both; animation-delay: calc(var(--i) * 70ms + 300ms); }
+@keyframes rise { from { opacity: 0; translate: 0 18px; } }
+
+.pillow {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  margin: 0;
+  padding: 8px 18px 8px 9px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--glass-top), var(--glass-bottom));
+  color: var(--moon);
+  font: 700 1.0625rem/1.2 var(--font);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 4px 0 var(--key-edge), 0 10px 22px rgba(5, 3, 20, 0.4);
+  transition: translate 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+}
+.pillow:active {
+  translate: 0 3px;
+  box-shadow: 0 1px 0 var(--key-edge), 0 4px 10px rgba(5, 3, 20, 0.4);
+}
+@media (hover: hover) {
+  .pillow:hover { translate: 0 -2px; background: linear-gradient(180deg, rgba(255, 240, 210, 0.24), rgba(255, 240, 210, 0.1)); }
+  .pillow:active { translate: 0 3px; }
+}
+.tile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--tile, var(--marigold));
+  box-shadow: inset 0 -3px 0 rgba(18, 15, 43, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+/* ---------- dialog (WhatsApp note) ---------- */
+dialog {
+  margin: auto auto 0;
+  width: min(100%, 520px);
+  max-width: 100%;
+  padding: 28px 22px calc(22px + env(safe-area-inset-bottom, 0px));
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--moon);
+  color: var(--ink);
+  box-shadow: 0 -12px 40px rgba(5, 3, 20, 0.5);
+  translate: 0 0;
+  opacity: 1;
+  transition: translate 0.38s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.25s ease, display 0.38s allow-discrete, overlay 0.38s allow-discrete;
+}
+dialog:not([open]) { translate: 0 40px; opacity: 0; }
+@starting-style { dialog[open] { translate: 0 40px; opacity: 0; } }
+dialog::backdrop {
+  background: rgba(8, 5, 26, 0.62);
+  transition: background-color 0.3s ease, display 0.3s allow-discrete, overlay 0.3s allow-discrete;
+}
+dialog:not([open])::backdrop { background: transparent; }
+@starting-style { dialog[open]::backdrop { background: transparent; } }
+dialog h2 {
+  margin: 0 0 1.1rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.ok {
+  appearance: none;
+  width: 100%;
+  min-height: 54px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--marigold);
+  color: var(--ink);
+  font: 800 1.125rem/1 var(--font);
+  cursor: pointer;
+  box-shadow: 0 4px 0 #C97A00;
+  transition: translate 0.12s ease, box-shadow 0.12s ease;
+}
+.ok:active { translate: 0 3px; box-shadow: 0 1px 0 #C97A00; }
+
+@media (max-height: 700px) {
+  .page { padding-block: 16px 18px; }
+  .head p { margin-top: 0.3rem; }
+  .links { gap: 8px; }
+  .pillow { min-height: 52px; }
+  .tile { width: 38px; height: 38px; font-size: 1.25rem; }
+  .wake { margin-bottom: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .links li { animation: none; }
+  .wake .paw { animation: none; }
+  .fallback.nudge { animation: none; }
+  .bubble, dialog, dialog::backdrop, .pillow, .wake, .ok { transition: none; }
+}
+</style>
+
+<div class="sky" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+
+<main class="page">
+  <header class="head">
+    <h1>Aalsi Billi</h1>
+    <p>Soi hui hai. Jagane ka try karo 😼</p>
+  </header>
+
+  <section class="stage" id="stage" aria-label="Sleeping cat. Tap to wake her, drag sideways to turn her.">
+    <div class="fallback" id="fallback" hidden>😴</div>
+    <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+  </section>
+
+  <button class="wake" id="wake" type="button"><span class="paw" aria-hidden="true">👆</span>Billi ko jagao</button>
+
+  <ul class="links">
+    <li style="--i:0"><a class="pillow" href="https://www.instagram.com/someone_u_know_0_o/" target="_blank" rel="noopener noreferrer"><span class="tile" style="--tile:linear-gradient(135deg,#FF78A8,#FFAA2E)" aria-hidden="true">📸</span>Follow me on Instagram</a></li>
+    <li style="--i:1"><a class="pillow" href="https://www.snapchat.com/add/satyamkr0_0" target="_blank" rel="noopener noreferrer"><span class="tile" style="--tile:linear-gradient(135deg,#FFE66B,#FFC83D)" aria-hidden="true">👻</span>Add me on Snapchat</a></li>
+    <li style="--i:2"><a class="pillow" href="https://github.com/satyam-64136" target="_blank" rel="noopener noreferrer"><span class="tile" style="--tile:linear-gradient(135deg,#A592FF,#7B62F0)" aria-hidden="true">🐙</span>Follow me on Github</a></li>
+    <li style="--i:3"><button class="pillow" id="wa-btn" type="button"><span class="tile" style="--tile:linear-gradient(135deg,#6CF0B0,#2FC98A)" aria-hidden="true">💬</span>Text me on Whatsapp</button></li>
+    <li style="--i:4"><a class="pillow" href="https://t.me/Someone_who_disappears" target="_blank" rel="noopener noreferrer"><span class="tile" style="--tile:linear-gradient(135deg,#7FD6FF,#3CA8F2)" aria-hidden="true">✈️</span>Text me on Telegram</a></li>
+  </ul>
+</main>
+
+<dialog id="wa-dialog" closedby="any" aria-labelledby="wa-title">
+  <form method="dialog">
+    <h2 id="wa-title">Number public krne se already fielding lg chuki hai firse nhi krunga😔💪</h2>
+    <button class="ok" type="submit" value="ok">Theek hai</button>
+  </form>
+</dialog>
+
+<script async id="three-src" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const stage = $("stage"), bubble = $("bubble"), wakeBtn = $("wake");
+  const canvas = $("scene"), fallbackEl = $("fallback");
+  const dlg = $("wa-dialog"), waBtn = $("wa-btn");
+  const reduceMQ = matchMedia("(prefers-reduced-motion: reduce)");
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  /* ------------------------------------------------------------------
+     Cat controller. Everything below talks to this object, so the page
+     still works (bubble, dialog, links) when WebGL is unavailable.
+  ------------------------------------------------------------------ */
+  const MSGS = ["Oye! Sone de na 😾", "Kya chahiye bhai? 🥱", "Abhi to neend aayi thi…", "Ek aur baar chhua to…"];
+  const ANGRY = "MEOW! Theek hai, links dekh lo 👇";
+
+  const ctl = {
+    mode: "loading",          // loading | webgl | fallback
+    state: "sleep",           // sleep | awake | annoyed
+    pokes: 0,
+    wakeUntil: 0,
+    hold: false,              // dialog open: cat stays awake
+    peeking: false,           // a link is being pressed: cat peeks
+    jump: -1,
+    burst: () => {},
+    dirty: () => {},
+    bubbleAt: null            // set by the 3D scene to anchor the bubble on the head
+  };
+
+  let bubbleTimer = 0;
+  function say(text, ms) {
+    bubble.textContent = text;
+    bubble.classList.add("show");
+    placeBubble();
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(() => bubble.classList.remove("show"), ms);
+  }
+
+  function placeBubble() {
+    const sw = stage.clientWidth, bw = bubble.offsetWidth;
+    let x = sw / 2, y = stage.clientHeight * 0.3;
+    if (ctl.bubbleAt) {
+      const p = ctl.bubbleAt();
+      if (p) { x = p.x; y = p.y; }
+    }
+    x = clamp(x, bw / 2 + 4, sw - bw / 2 - 4);
+    y = Math.max(y, bubble.offsetHeight + 10);
+    bubble.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0) translate(-50%,-100%)";
+  }
+
+  function setState(s) {
+    if (ctl.state === s) return;
+    ctl.state = s;
+    ctl.dirty();
+  }
+
+  function poke() {
+    ctl.pokes += 1;
+    ctl.wakeUntil = performance.now() + 2600;
+    wakeBtn.classList.add("used");
+    const annoyed = ctl.pokes % 5 === 0;
+    try { navigator.vibrate && navigator.vibrate(annoyed ? [30, 40, 30] : 12); } catch (_) {}
+    if (annoyed) {
+      setState("annoyed");
+      ctl.jump = 0;
+      ctl.burst();
+      say(ANGRY, 2800);
+    } else {
+      setState("awake");
+      say(MSGS[(ctl.pokes % 5) - 1], 1900);
+    }
+    if (ctl.mode === "fallback") {
+      fallbackEl.textContent = "😼";
+      fallbackEl.classList.remove("nudge");
+      void fallbackEl.offsetWidth;
+      fallbackEl.classList.add("nudge");
+      clearTimeout(ctl.fbTimer);
+      ctl.fbTimer = setTimeout(() => { if (!ctl.hold) fallbackEl.textContent = "😴"; }, 2600);
+    }
+    ctl.dirty();
+  }
+
+  /* ---------- sleep timer (shared by both modes) ---------- */
+  setInterval(() => {
+    if (ctl.state !== "sleep" && !ctl.hold && !ctl.peeking && performance.now() > ctl.wakeUntil) {
+      setState("sleep");
+    }
+  }, 150);
+
+  /* ---------- link press: the cat peeks ---------- */
+  document.querySelectorAll(".pillow").forEach((el) => {
+    const on = () => { ctl.peeking = true; ctl.dirty(); };
+    const off = () => { ctl.peeking = false; ctl.dirty(); };
+    el.addEventListener("pointerdown", on);
+    el.addEventListener("pointerup", off);
+    el.addEventListener("pointerleave", off);
+    el.addEventListener("pointercancel", off);
+    el.addEventListener("focus", on);
+    el.addEventListener("blur", off);
+  });
+
+  /* ---------- WhatsApp note dialog ---------- */
+  waBtn.addEventListener("click", () => {
+    ctl.hold = true;
+    ctl.peeking = false;
+    if (ctl.mode === "fallback") fallbackEl.textContent = "😼";
+    ctl.dirty();
+    if (typeof dlg.showModal === "function") dlg.showModal();
+  });
+  dlg.addEventListener("close", () => {
+    ctl.hold = false;
+    ctl.wakeUntil = performance.now() + 900;
+    ctl.dirty();
+  });
+  // Light-dismiss fallback for browsers without <dialog closedby> (Safari).
+  if (!("closedBy" in HTMLDialogElement.prototype)) {
+    dlg.addEventListener("click", (event) => {
+      if (event.target !== dlg) return;
+      const r = dlg.getBoundingClientRect();
+      const inside = r.top <= event.clientY && event.clientY <= r.top + r.height &&
+                     r.left <= event.clientX && event.clientX <= r.left + r.width;
+      if (!inside) dlg.close();
+    });
+  }
+
+  /* ---------- tilt permission (iOS needs a user gesture) ---------- */
+  const DOE = window.DeviceOrientationEvent;
+  const needsPermission = !!(DOE && typeof DOE.requestPermission === "function");
+  let tiltReady = false;
+  const tilt = { x: 0, y: 0 };
+  function onOrient(e) {
+    if (e.gamma == null || reduceMQ.matches) return;
+    tilt.x = clamp(e.gamma / 28, -1, 1);
+    tilt.y = clamp(((e.beta == null ? 50 : e.beta) - 50) / 28, -1, 1);
+  }
+  function listenTilt() {
+    if (tiltReady) return;
+    tiltReady = true;
+    window.addEventListener("deviceorientation", onOrient, { passive: true });
+  }
+  function askTilt() {
+    if (tiltReady || reduceMQ.matches) return;
+    if (!needsPermission) { listenTilt(); return; }
+    DOE.requestPermission().then((r) => { if (r === "granted") listenTilt(); }).catch(() => {});
+  }
+  if (!needsPermission) listenTilt();
+
+  wakeBtn.addEventListener("click", () => { askTilt(); poke(); });
+
+  /* ---------- stage gestures: tap = poke, horizontal drag = turn the cat ---------- */
+  const drag = { id: -1, x0: 0, last: 0, t0: 0, moved: false };
+  const pointer = { x: 0, y: 0, has: false };   // normalised device coords, for the eyes
+  const orbit = { yaw: 0, target: 0, active: false };
+
+  function trackPointer(e) {
+    pointer.x = (e.clientX / innerWidth) * 2 - 1;
+    pointer.y = -((e.clientY / innerHeight) * 2 - 1);
+    pointer.has = true;
+    if (e.pointerType === "mouse" && !reduceMQ.matches) {
+      tilt.x = pointer.x * 0.8;
+      tilt.y = -pointer.y * 0.6;
+    }
+  }
+  window.addEventListener("pointermove", trackPointer, { passive: true });
+
+  stage.addEventListener("pointerdown", (e) => {
+    trackPointer(e);
+    drag.id = e.pointerId; drag.x0 = drag.last = e.clientX; drag.t0 = performance.now(); drag.moved = false;
+  });
+  stage.addEventListener("pointermove", (e) => {
+    if (e.pointerId !== drag.id) return;
+    if (!drag.moved && Math.abs(e.clientX - drag.x0) > 8) {
+      drag.moved = true;
+      orbit.active = true;
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    if (drag.moved) {
+      orbit.target = clamp(orbit.target + (e.clientX - drag.last) * 0.012, -1.25, 1.25);
+      ctl.dirty();
+    }
+    drag.last = e.clientX;
+  });
+  const endDrag = (e, cancelled) => {
+    if (e.pointerId !== drag.id) return;
+    const tap = !drag.moved && !cancelled && performance.now() - drag.t0 < 500;
+    drag.id = -1;
+    orbit.active = false;
+    if (tap) { askTilt(); poke(); }
+  };
+  stage.addEventListener("pointerup", (e) => endDrag(e, false));
+  stage.addEventListener("pointercancel", (e) => endDrag(e, true));
+
+  /* ------------------------------------------------------------------
+     Fallback: no WebGL or three.js could not load
+  ------------------------------------------------------------------ */
+  function useFallback() {
+    if (ctl.mode === "webgl") return;
+    ctl.mode = "fallback";
+    canvas.style.display = "none";
+    fallbackEl.hidden = false;
+  }
+
+  /* ------------------------------------------------------------------
+     3D scene
+  ------------------------------------------------------------------ */
+  function startScene() {
+    const THREE = window.THREE;
+    if (!THREE) return useFallback();
+
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch (_) { return useFallback(); }
+    ctl.mode = "webgl";
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setClearColor(0x000000, 0);
+    canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); ctl.mode = "loading"; useFallback(); });
+
+    const scene = new THREE.Scene();
+    const FOV = 34;
+    const tanV = Math.tan((FOV * Math.PI) / 360);
+    const camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 300);
+
+    /* ---- lights + toon ramp ---- */
+    scene.add(new THREE.HemisphereLight(0xbfb0ff, 0x2a1a55, 0.95));
+    const key = new THREE.DirectionalLight(0xffd29a, 1.15); key.position.set(3.5, 5, 5); scene.add(key);
+    const rim = new THREE.DirectionalLight(0x7aa8ff, 0.8); rim.position.set(-5, 3, -4); scene.add(rim);
+
+    const ramp = new Uint8Array([85, 165, 255]);
+    const rampFormat = renderer.capabilities.isWebGL2 ? THREE.RedFormat : THREE.LuminanceFormat;
+    const rampTex = new THREE.DataTexture(ramp, ramp.length, 1, rampFormat);
+    rampTex.minFilter = rampTex.magFilter = THREE.NearestFilter;
+    rampTex.generateMipmaps = false;
+    rampTex.needsUpdate = true;
+    const toon = (c) => new THREE.MeshToonMaterial({ color: c, gradientMap: rampTex });
+    const flat = (c, o) => new THREE.MeshBasicMaterial(Object.assign({ color: c }, o || {}));
+
+    const mOrange = toon(0xffa62b), mOrangeDark = toon(0xe5820f), mCream = toon(0xfff0d2);
+    const mPink = toon(0xff8fb1), mCushion = toon(0x7b4dd6), mCushionHi = toon(0x9a74f0);
+    const mInk = flat(0x24132f), mWhite = flat(0xfff6e0), mAmber = flat(0xffc24b);
+
+    const UNIT = new THREE.SphereGeometry(1, 32, 24);
+    const UNIT_LO = new THREE.SphereGeometry(1, 16, 12);
+    const ell = (mat, rx, ry, rz, lo) => {
+      const m = new THREE.Mesh(lo ? UNIT_LO : UNIT, mat);
+      m.scale.set(rx, ry, rz);
+      return m;
+    };
+
+    function canvasTex(w, h, draw) {
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      draw(c.getContext("2d"), w, h);
+      return new THREE.CanvasTexture(c);
+    }
+    const dotTex = canvasTex(64, 64, (g, w) => {
+      const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+      r.addColorStop(0, "rgba(255,255,255,1)");
+      r.addColorStop(0.45, "rgba(255,255,255,0.7)");
+      r.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = r; g.fillRect(0, 0, w, w);
+    });
+
+    /* ---- the creature ---- */
+    const rig = new THREE.Group();          // follows the stage, floats, tilts, turns
+    const cat = new THREE.Group();          // squash and stretch lives here
+    rig.add(cat);
+    scene.add(rig);
+    rig.rotation.x = 0.2;
+
+    const cushion = ell(mCushion, 2.35, 0.42, 1.75); cushion.position.y = -0.05; cat.add(cushion);
+    const tuft = ell(mCushionHi, 0.24, 0.1, 0.24, true); tuft.position.set(-1.5, 0.34, 0.55); cat.add(tuft);
+    const tuft2 = ell(mCushionHi, 0.24, 0.1, 0.24, true); tuft2.position.set(1.55, 0.3, -0.5); cat.add(tuft2);
+
+    const body = new THREE.Group(); body.position.set(-0.15, 0.82, -0.05); cat.add(body);
+    body.add(ell(mOrange, 1.5, 0.82, 1.05));
+    [-0.8, -0.3, 0.2].forEach((dx) => {
+      const k = Math.sqrt(1 - Math.pow(dx / 1.5, 2));
+      const stripe = new THREE.Mesh(new THREE.TorusGeometry(1, 0.055, 8, 40, Math.PI), mOrangeDark);
+      stripe.rotation.y = Math.PI / 2;
+      stripe.scale.set(1.05 * k * 1.02, 0.82 * k * 1.02, 1);
+      stripe.position.x = dx;
+      body.add(stripe);
+    });
+    const haunch = ell(mOrangeDark, 0.62, 0.55, 0.55); haunch.position.set(-0.75, 0.6, 0.62); cat.add(haunch);
+    const backPaw = ell(mCream, 0.3, 0.14, 0.24, true); backPaw.position.set(-0.25, 0.43, 1.0); cat.add(backPaw);
+    const pawL = ell(mCream, 0.3, 0.17, 0.4, true); pawL.position.set(0.82, 0.44, 1.12); cat.add(pawL);
+    const pawR = ell(mCream, 0.3, 0.17, 0.4, true); pawR.position.set(1.4, 0.42, 0.98); cat.add(pawR);
+
+    /* tail: tube pivoting at its base so it can wag */
+    const tail = new THREE.Group(); tail.position.set(-1.5, 0.6, 0.2); cat.add(tail);
+    const tailPts = [[0, 0, 0], [-0.15, -0.1, 0.7], [0.35, -0.2, 1.35], [1.15, -0.25, 1.6], [1.75, -0.18, 1.5], [2.1, -0.12, 1.25]]
+      .map((p) => new THREE.Vector3(p[0], p[1], p[2]));
+    tail.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(tailPts), 48, 0.15, 10, false), mOrange));
+    const tailTip = ell(mCream, 0.17, 0.17, 0.17, true); tailTip.position.copy(tailPts[tailPts.length - 1]); tail.add(tailTip);
+
+    /* head */
+    const head = new THREE.Group(); head.position.set(1.05, 0.92, 0.62); cat.add(head);
+    head.add(ell(mOrange, 0.7, 0.6, 0.62));
+    [-1, 1].forEach((s) => {
+      const cheek = ell(mCream, 0.22, 0.17, 0.18, true); cheek.position.set(0.17 * s, -0.2, 0.47); head.add(cheek);
+    });
+    const nose = ell(mPink, 0.07, 0.05, 0.05, true); nose.position.set(0, -0.09, 0.6); head.add(nose);
+    [-1, 1].forEach((s) => {
+      const m = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 12, Math.PI), mInk);
+      m.rotation.z = Math.PI; m.position.set(0.06 * s, -0.19, 0.645); head.add(m);
+    });
+
+    const eyes = [];
+    [-1, 1].forEach((s) => {
+      const g = new THREE.Group(); g.position.set(0.27 * s, 0.06, 0.54); head.add(g);
+      g.add(ell(mWhite, 0.14, 0.16, 0.08, true));
+      const look = new THREE.Group(); g.add(look);
+      const iris = ell(mAmber, 0.1, 0.13, 0.02, true); iris.position.z = 0.075; look.add(iris);
+      const pupil = ell(mInk, 0.04, 0.1, 0.03, true); pupil.position.z = 0.085; look.add(pupil);
+      const glint = ell(flat(0xffffff), 0.025, 0.025, 0.02, true); glint.position.set(0.03, 0.05, 0.105); look.add(glint);
+      const lid = ell(mOrange, 0.155, 0.175, 0.1, true); lid.position.z = 0.015; g.add(lid);
+      const closed = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.017, 6, 16, Math.PI), mInk);
+      closed.rotation.z = Math.PI; closed.position.set(0, 0.03, 0.118); g.add(closed);
+      const brow = ell(mInk, 0.17, 0.03, 0.03, true); brow.position.set(0, 0.22, 0.06); g.add(brow);
+      eyes.push({ g, look, lid, closed, brow, s });
+    });
+
+    const ears = [];
+    [-1, 1].forEach((s) => {
+      const geo = new THREE.ConeGeometry(0.24, 0.46, 3); geo.translate(0, 0.23, 0);
+      const ear = new THREE.Group(); ear.position.set(0.43 * s, 0.42, 0); head.add(ear);
+      const outer = new THREE.Mesh(geo, mOrange); outer.scale.z = 0.55; ear.add(outer);
+      const inner = new THREE.Mesh(geo, mPink); inner.scale.set(0.58, 0.68, 0.4); inner.position.z = 0.05; ear.add(inner);
+      ears.push({ ear, s });
+    });
+
+    const whiskerGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.5, 4);
+    const mWhisker = flat(0xfff0d2, { transparent: true, opacity: 0.85 });
+    [-1, 1].forEach((s) => {
+      [-0.1, 0, 0.1].forEach((a, i) => {
+        const w = new THREE.Mesh(whiskerGeo, mWhisker);
+        w.rotation.z = Math.PI / 2 + a * s * -1.4;
+        w.position.set(0.58 * s, -0.12 + (i - 1) * 0.05, 0.5);
+        head.add(w);
+      });
+    });
+
+    /* zzz sprites */
+    const zTex = canvasTex(128, 128, (g, w) => {
+      g.font = "800 96px system-ui, sans-serif";
+      g.textAlign = "center"; g.textBaseline = "middle";
+      g.shadowColor = "rgba(255,240,210,0.8)"; g.shadowBlur = 14;
+      g.fillStyle = "#FFF0D2"; g.fillText("z", w / 2, w / 2 + 4);
+    });
+    const zs = [0, 1, 2].map((i) => {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: zTex, transparent: true, depthWrite: false, opacity: 0 }));
+      rig.add(sp);
+      return { sp, phase: i / 3 };
+    });
+
+    /* annoyed burst */
+    const BN = 26;
+    const bPos = new Float32Array(BN * 3), bVel = new Float32Array(BN * 3);
+    const bGeo = new THREE.BufferGeometry();
+    bGeo.setAttribute("position", new THREE.BufferAttribute(bPos, 3));
+    const bMat = new THREE.PointsMaterial({ size: 0.4, map: dotTex, color: 0xffaa2e, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+    const bPts = new THREE.Points(bGeo, bMat); bPts.frustumCulled = false; rig.add(bPts);
+    let bLife = 0;
+    ctl.burst = () => {
+      if (reduceMQ.matches) return;
+      for (let i = 0; i < BN; i++) {
+        bPos[i * 3] = head.position.x; bPos[i * 3 + 1] = head.position.y + 0.3; bPos[i * 3 + 2] = head.position.z + 0.4;
+        const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 2.4;
+        bVel[i * 3] = Math.cos(a) * sp; bVel[i * 3 + 1] = 2.2 + Math.random() * 2.4; bVel[i * 3 + 2] = Math.sin(a) * sp * 0.6 + 1;
+      }
+      bLife = 1;
+    };
+
+    /* ---- sky: soft glow, moon, twinkling stars, shooting star ---- */
+    const sky = new THREE.Group(); scene.add(sky);
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, color: 0xffaa2e, transparent: true, opacity: 0.32, depthWrite: false, blending: THREE.AdditiveBlending }));
+    halo.scale.set(9, 6.4, 1); halo.position.set(0, 0.9, -2.5); rig.add(halo);
+
+    const moon = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 24), flat(0xfff0d2)); sky.add(moon);
+    [[-0.3, 0.25, 0.28], [0.35, -0.2, 0.2], [0.1, 0.5, 0.14]].forEach((c) => {
+      const cr = new THREE.Mesh(new THREE.CircleGeometry(c[2], 20), flat(0xe9d3a8, { transparent: true, opacity: 0.7 }));
+      cr.position.set(c[0], c[1], Math.sqrt(Math.max(0.01, 1 - c[0] * c[0] - c[1] * c[1])) + 0.01);
+      moon.add(cr);
+    });
+    const moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, color: 0xfff0d2, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending }));
+    moonGlow.scale.setScalar(4.2); moon.add(moonGlow);
+
+    function makeStars(n, size, seed) {
+      const base = [], col = new Float32Array(n * 3);
+      const tint = [[1, 1, 1], [0.8, 0.86, 1], [1, 0.9, 0.74], [0.88, 0.8, 1]];
+      for (let i = 0; i < n; i++) {
+        base.push([Math.random() * 2.3 - 1.15, Math.random() * 2.3 - 1.15, 8 + Math.random() * 46]);
+        const c = tint[(i + seed) % tint.length];
+        col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2];
+      }
+      const geo = new THREE.BufferGeometry();
+      const pos = new Float32Array(n * 3);
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+      const mat = new THREE.PointsMaterial({ size, map: dotTex, vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false });
+      const pts = new THREE.Points(geo, mat); pts.frustumCulled = false; sky.add(pts);
+      return { base, pos, geo, mat };
+    }
+    const starsA = makeStars(130, 0.3, 0), starsB = makeStars(110, 0.22, 2);
+
+    const streakTex = canvasTex(256, 16, (g, w, h) => {
+      const l = g.createLinearGradient(0, 0, w, 0);
+      l.addColorStop(0, "rgba(255,240,210,0)"); l.addColorStop(1, "rgba(255,255,255,1)");
+      g.fillStyle = l; g.fillRect(0, h * 0.3, w, h * 0.4);
+    });
+    const streak = new THREE.Sprite(new THREE.SpriteMaterial({ map: streakTex, transparent: true, depthWrite: false, opacity: 0 }));
+    streak.visible = false; sky.add(streak);
+    const shoot = { t: -1, next: 5, x: 0, y: 0, dx: 0, dy: 0, ang: 0 };
+
+    /* ---- layout: fit the cat to the stage, keep it glued to it while scrolling ---- */
+    let W = 1, H = 1, D = 20, ppu = 60;
+    const ndcToWorld = (nx, ny, Z, out) => {
+      const dist = D + Z, tanH = tanV * (W / H);
+      out.set(nx * tanH * dist, ny * tanV * dist, -Z);
+      return out;
+    };
+    const tmp = new THREE.Vector3();
+
+    function placeSky() {
+      [starsA, starsB].forEach((st) => {
+        for (let i = 0; i < st.base.length; i++) {
+          const b = st.base[i];
+          ndcToWorld(b[0], b[1], b[2], tmp);
+          st.pos[i * 3] = tmp.x; st.pos[i * 3 + 1] = tmp.y; st.pos[i * 3 + 2] = tmp.z;
+        }
+        st.geo.attributes.position.needsUpdate = true;
+      });
+      const Z = 38;
+      ndcToWorld(W < 500 ? 0.66 : 0.8, 0.8, Z, moon.position);
+      moon.scale.setScalar((34 * 2 * (D + Z) * tanV) / H);   // about 34px radius on screen
+    }
+
+    let baseY = 0;
+    function followStage() {
+      const r = stage.getBoundingClientRect();
+      const cy = r.top + r.height * 0.55;
+      baseY = (1 - (2 * cy) / H) * tanV * D - 0.55;
+    }
+
+    function layout() {
+      W = canvas.clientWidth || innerWidth;
+      H = canvas.clientHeight || innerHeight;
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H;
+      camera.updateProjectionMatrix();
+      const r = stage.getBoundingClientRect();
+      const sw = Math.max(200, r.width), sh = Math.max(180, r.height);
+      ppu = Math.min((0.9 * sw) / 4.9, sh / 3.7);
+      D = H / (ppu * 2 * tanV);
+      placeSky();
+      followStage();
+      needs = true;
+    }
+
+    /* ---- head position for the speech bubble ---- */
+    const hv = new THREE.Vector3();
+    ctl.bubbleAt = () => {
+      rig.updateMatrixWorld(true);
+      hv.setFromMatrixPosition(head.matrixWorld).project(camera);
+      const r = stage.getBoundingClientRect();
+      return {
+        x: (hv.x * 0.5 + 0.5) * W - r.left,
+        y: (1 - (hv.y * 0.5 + 0.5)) * H - r.top - ppu * 0.55
+      };
+    };
+
+    /* ---- animation state ---- */
+    const S = { eye: 0, lift: 0, perk: 0, brow: 0, tailAmp: 0.05, tailHz: 1.2, breath: 0.028, hz: 0.45, lookX: 0, lookY: 0 };
+    let needs = true, last = performance.now(), t = 0, nextTwitch = 3, twitch = -1, sleepy = 1;
+    ctl.dirty = () => { needs = true; };
+
+    const smooth = (cur, target, rate, dt) => reduceMQ.matches ? target : cur + (target - cur) * (1 - Math.exp(-dt * rate));
+
+    function update(dt, now) {
+      const reduce = reduceMQ.matches;
+      const st = ctl.state;
+      const awake = st !== "sleep" || ctl.hold;
+
+      const eyeT = Math.max(awake ? 1 : 0, ctl.peeking ? 0.55 : 0);
+      S.eye = smooth(S.eye, eyeT, 14, dt);
+      S.lift = smooth(S.lift, st === "annoyed" ? 0.2 : awake ? 0.1 : 0, 8, dt);
+      S.perk = smooth(S.perk, st === "annoyed" ? 0.5 : (awake || ctl.peeking) ? 0.25 : 0, 10, dt);
+      S.brow = smooth(S.brow, st === "annoyed" ? 1 : 0, 14, dt);
+      S.tailAmp = smooth(S.tailAmp, st === "annoyed" ? 0.45 : awake ? 0.2 : 0.05, 6, dt);
+      S.tailHz = smooth(S.tailHz, st === "annoyed" ? 9 : awake ? 3 : 1.2, 6, dt);
+      S.breath = smooth(S.breath, st === "annoyed" ? 0.012 : awake ? 0.016 : 0.028, 5, dt);
+      S.hz = smooth(S.hz, awake ? 0.9 : 0.45, 5, dt);
+      sleepy = 1 - clamp(S.eye * 1.4, 0, 1);
+
+      /* eyes */
+      eyes.forEach((e) => {
+        const open = clamp(S.eye, 0, 1);
+        e.lid.scale.y = 0.175 * (1 - open * 0.97) + 0.004;
+        e.lid.position.y = open * 0.15;
+        e.lid.visible = open < 0.97;
+        e.closed.visible = open < 0.12;
+        e.brow.visible = S.brow > 0.05;
+        e.brow.rotation.z = 0.5 * e.s * S.brow;
+        e.brow.position.y = 0.3 - S.brow * 0.07;
+      });
+
+      /* pupils and head follow the pointer while she is awake */
+      let lx = 0, ly = 0;
+      if (S.eye > 0.3 && pointer.has) {
+        hv.setFromMatrixPosition(head.matrixWorld).project(camera);
+        lx = clamp((pointer.x - hv.x) * 1.4, -1, 1);
+        ly = clamp((pointer.y - hv.y) * 1.4, -1, 1);
+      }
+      S.lookX = smooth(S.lookX, lx, 9, dt);
+      S.lookY = smooth(S.lookY, ly, 9, dt);
+      eyes.forEach((e) => { e.look.position.set(S.lookX * 0.04, S.lookY * 0.045, 0); });
+
+      /* head, ears, tail, breathing */
+      head.rotation.set(-S.lookY * 0.1 - S.lift * 0.5, -0.2 + S.lookX * 0.2, 0.12 - S.lift * 0.4);
+      head.position.y = 0.92 + S.lift;
+      if (!reduce && now / 1000 > nextTwitch) { twitch = 0; nextTwitch = now / 1000 + 4 + Math.random() * 6; }
+      const tw = twitch >= 0 ? Math.sin(Math.min(twitch, 0.35) / 0.35 * Math.PI * 3) * 0.35 * (1 - twitch / 0.35 * 0.0) : 0;
+      if (twitch >= 0) { twitch += dt; if (twitch > 0.35) twitch = -1; }
+      ears.forEach((e) => {
+        e.ear.rotation.z = -e.s * (0.4 - S.perk * 0.25) + (e.s > 0 ? tw : 0);
+        e.ear.rotation.x = 0.12 - S.perk * 0.3;
+      });
+      const wag = reduce ? 0 : Math.sin(t * S.tailHz * Math.PI * 2) * S.tailAmp;
+      tail.rotation.y = wag;
+      tail.rotation.z = reduce ? 0 : Math.sin(t * S.tailHz * Math.PI * 2 + 1) * S.tailAmp * 0.25;
+
+      const breathe = reduce ? 0 : Math.sin(t * S.hz * Math.PI * 2) * S.breath;
+      body.scale.set(1 + breathe * 0.4, 1 + breathe, 1 + breathe * 0.6);
+
+      /* jump (annoyed) with squash and stretch */
+      let jy = 0, sy = 1;
+      if (ctl.jump >= 0 && !reduce) {
+        ctl.jump += dt;
+        const T = 0.55;
+        if (ctl.jump >= T) ctl.jump = -1;
+        else {
+          jy = 1.1 * Math.sin((Math.PI * ctl.jump) / T);
+          sy = 1 + 0.12 * Math.sin((Math.PI * ctl.jump) / T) - (ctl.jump < 0.1 ? 0.1 * (1 - ctl.jump / 0.1) : 0);
+        }
+      } else if (ctl.jump >= 0) ctl.jump = -1;
+      cat.scale.set(1 / Math.sqrt(sy), sy, 1 / Math.sqrt(sy));
+
+      /* rig: float, turn, tilt */
+      orbit.yaw = reduce ? orbit.target : orbit.yaw + (orbit.target - orbit.yaw) * (1 - Math.exp(-dt * 12));
+      if (!orbit.active) orbit.target *= Math.exp(-dt * (reduce ? 30 : 1.8));
+      if (Math.abs(orbit.target) < 0.002) orbit.target = 0;
+      const bob = reduce ? 0 : Math.sin(t * 0.9) * 0.07;
+      rig.position.y = baseY + bob + jy;
+      const tx = reduce ? 0 : smoothTilt.x, ty = reduce ? 0 : smoothTilt.y;
+      rig.rotation.y = orbit.yaw + tx * 0.28;
+      rig.rotation.x = 0.2 - ty * 0.06;
+
+      /* zzz */
+      zs.forEach((z) => {
+        const k = reduce ? 0.35 + z.phase * 0.4 : (t / 3.3 + z.phase) % 1;
+        const a = Math.sin(Math.PI * k);
+        z.sp.material.opacity = a * 0.9 * sleepy;
+        const sc = 0.28 + k * 0.4;
+        z.sp.scale.set(sc, sc, 1);
+        z.sp.position.set(head.position.x + 0.15 + k * 0.7, head.position.y + 0.75 + k * 1.2 + S.lift, head.position.z - 0.1);
+      });
+
+      /* burst */
+      if (bLife > 0) {
+        bLife = Math.max(0, bLife - dt * 1.3);
+        for (let i = 0; i < BN; i++) {
+          bVel[i * 3 + 1] -= 6 * dt;
+          bPos[i * 3] += bVel[i * 3] * dt; bPos[i * 3 + 1] += bVel[i * 3 + 1] * dt; bPos[i * 3 + 2] += bVel[i * 3 + 2] * dt;
+        }
+        bGeo.attributes.position.needsUpdate = true;
+        bMat.opacity = bLife;
+      } else bMat.opacity = 0;
+
+      /* sky */
+      if (!reduce) {
+        starsA.mat.opacity = 0.55 + 0.45 * Math.sin(t * 1.3);
+        starsB.mat.opacity = 0.55 + 0.45 * Math.sin(t * 1.3 + Math.PI);
+        halo.material.opacity = 0.3 + Math.sin(t * 0.9) * 0.04 + (awake ? 0.08 : 0);
+        shoot.next -= dt;
+        if (shoot.t < 0 && shoot.next <= 0) {
+          shoot.t = 0; shoot.next = 7 + Math.random() * 7;
+          shoot.x = -0.2 + Math.random() * 1.1; shoot.y = 0.35 + Math.random() * 0.6;
+          shoot.ang = Math.PI + 0.45 + Math.random() * 0.25;
+          shoot.dx = Math.cos(shoot.ang); shoot.dy = Math.sin(shoot.ang);
+          streak.visible = true; streak.material.rotation = shoot.ang;
+        }
+        if (shoot.t >= 0) {
+          shoot.t += dt;
+          const k = shoot.t / 1.1;
+          if (k >= 1) { shoot.t = -1; streak.visible = false; }
+          else {
+            ndcToWorld(shoot.x + shoot.dx * k * 0.9, shoot.y + shoot.dy * k * 0.9, 34, tmp);
+            streak.position.copy(tmp);
+            const L = (90 * 2 * (D + 34) * tanV) / H;
+            streak.scale.set(L, L * 0.06, 1);
+            streak.material.opacity = Math.sin(Math.PI * k);
+          }
+        }
+      }
+    }
+
+    const smoothTilt = { x: 0, y: 0 };
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (document.hidden || ctl.mode !== "webgl") { last = now; return; }
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now; t += dt;
+      const reduce = reduceMQ.matches;
+      smoothTilt.x += (tilt.x - smoothTilt.x) * (1 - Math.exp(-dt * 6));
+      smoothTilt.y += (tilt.y - smoothTilt.y) * (1 - Math.exp(-dt * 6));
+      update(dt, now);
+      camera.position.set(smoothTilt.x * 1.6 * (reduce ? 0 : 1), -smoothTilt.y * 1.0 * (reduce ? 0 : 1), D);
+      camera.lookAt(0, 0, 0);
+      if (ctl.bubbleAt && bubble.classList.contains("show")) placeBubble();
+      if (!reduce || needs) { renderer.render(scene, camera); needs = false; }
+    }
+
+    new ResizeObserver(layout).observe(canvas);
+    new ResizeObserver(layout).observe(stage);
+    addEventListener("resize", layout);
+    addEventListener("scroll", () => { followStage(); needs = true; }, { passive: true });
+    reduceMQ.addEventListener && reduceMQ.addEventListener("change", () => { needs = true; });
+
+    layout();
+    requestAnimationFrame((n) => { last = n; frame(n); });
+
+    /* a gentle first look: the cat's ear twitches shortly after load */
+    nextTwitch = 1.6;
+  }
+
+  /* ---------- boot ---------- */
+  const src = $("three-src");
+  if (window.THREE) startScene();
+  else {
+    src.addEventListener("load", startScene);
+    src.addEventListener("error", useFallback);
+    setTimeout(() => { if (ctl.mode === "loading") useFallback(); }, 9000);
+  }
+})();
+</script>
+
+</body></html>
