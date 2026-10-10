@@ -3,18 +3,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
 <style>
-/* Layout: a full-bleed WebGL eclipse sits behind everything. Readout row on top, a hero zone you can drag the moon in,
-   the title overlapping the lower corona, and the link list in thumb reach. */
+/* Layout: one calm screen. Big lowercase name, a bunny leaning out of the Instagram button, and five glass buttons in thumb reach.
+   Everything is visible at once; the only motion is a 0.5s settle and the reactions to touch. */
 :root {
-  --space: #04050C;
-  --ink: #F3EFE8;
-  --ink-dim: rgba(243, 239, 232, 0.66);
-  --ink-faint: rgba(243, 239, 232, 0.42);
-  --corona: #FFD9A3;
+  --night: #07070E;
+  --ink: #F4EFEA;
+  --ink-dim: rgba(244, 239, 234, 0.68);
+  --ink-faint: rgba(244, 239, 234, 0.44);
+  --rose: #FF8FB1;
+  --gold: #FFD9A3;
   --iris: #8FA8FF;
-  --line: rgba(243, 239, 232, 0.12);
-  --row: rgba(8, 10, 24, 0.66);
-  --glow: 0;
+  --fur: #FFF6F1;
   --display: "Syne", "Archivo Black", system-ui, sans-serif;
   --text: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color-scheme: dark;
@@ -23,7 +22,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
-  background: var(--space);
+  background: var(--night);
   color: var(--ink);
   font-family: var(--text);
   font-size: 1rem;
@@ -33,198 +32,221 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-#gl, .fb { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
-.fb { overflow: hidden; }
-.fb-sun {
-  position: absolute; left: var(--sx, 50%); top: var(--sy, 40%);
-  width: calc(var(--u, 400px) * 1.7); height: calc(var(--u, 400px) * 1.7);
-  translate: -50% -50%; border-radius: 50%;
-  background: radial-gradient(closest-side, #fff 0 23%, rgba(255, 220, 160, 0.9) 24%, rgba(255, 170, 90, 0.26) 46%, transparent 100%);
+/* ---------- ambient background: gradients only, so it costs almost nothing ---------- */
+.bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: var(--night); }
+.bg i { position: absolute; display: block; border-radius: 50%; will-change: transform; }
+.bg .a {
+  width: 95vmax; height: 95vmax; left: -48vmax; top: -52vmax;
+  background: radial-gradient(closest-side, rgba(88, 70, 230, 0.55), rgba(88, 70, 230, 0));
+  animation: drift-a 26s ease-in-out infinite alternate;
 }
-.fb-moon {
-  position: absolute; left: var(--sx, 50%); top: var(--sy, 40%);
-  width: calc(var(--u, 400px) * 0.414); height: calc(var(--u, 400px) * 0.414);
-  margin: calc(var(--u, 400px) * -0.207) 0 0 calc(var(--u, 400px) * -0.207);
-  border-radius: 50%; background: #02030A;
-  box-shadow: 0 0 0 1px rgba(255, 220, 170, 0.18), 0 0 36px rgba(255, 200, 140, 0.3);
+.bg .b {
+  width: 85vmax; height: 85vmax; right: -48vmax; top: 18vh;
+  background: radial-gradient(closest-side, rgba(214, 60, 120, 0.36), rgba(214, 60, 120, 0));
+  animation: drift-b 30s ease-in-out infinite alternate;
 }
+.bg .c {
+  width: 75vmax; height: 75vmax; left: -30vmax; bottom: -48vmax;
+  background: radial-gradient(closest-side, rgba(255, 170, 110, 0.2), rgba(255, 170, 110, 0));
+  animation: drift-c 34s ease-in-out infinite alternate;
+}
+.bg .stars {
+  inset: 0; width: auto; height: auto; border-radius: 0;
+  background-image:
+    radial-gradient(1px 1px at 22px 34px, rgba(255,255,255,.95), transparent),
+    radial-gradient(1px 1px at 96px 120px, rgba(255,255,255,.8), transparent),
+    radial-gradient(1.4px 1.4px at 170px 52px, rgba(255,235,210,.9), transparent),
+    radial-gradient(1px 1px at 230px 190px, rgba(210,225,255,.85), transparent),
+    radial-gradient(1px 1px at 60px 230px, rgba(255,255,255,.7), transparent),
+    radial-gradient(1.2px 1.2px at 140px 270px, rgba(255,255,255,.85), transparent),
+    radial-gradient(1px 1px at 280px 110px, rgba(255,235,210,.8), transparent);
+  background-size: 310px 310px;
+  opacity: 0.5;
+  animation: twinkle 7s ease-in-out infinite alternate;
+}
+@keyframes drift-a { to { transform: translate3d(9vmax, 7vmax, 0); } }
+@keyframes drift-b { to { transform: translate3d(-8vmax, -9vmax, 0); } }
+@keyframes drift-c { to { transform: translate3d(10vmax, -6vmax, 0); } }
+@keyframes twinkle { to { opacity: 0.22; } }
 
-/* ---------- page frame (no z-index, so the title can blend with the canvas) ---------- */
+/* ---------- page ---------- */
 .page {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-height: 100dvh;
   max-width: 520px;
   margin-inline: auto;
   padding-inline: 18px;
-  padding-block: 18px 22px;
+  padding-block: 28px 30px;
 }
 
-.top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-}
-.readout { margin: 0; display: flex; gap: 0.6em; color: var(--ink-faint); }
-.readout .val { color: var(--ink); font-variant-numeric: tabular-nums; min-width: 4.2em; }
-.hint {
-  margin: 0; display: flex; align-items: center; gap: 0.55em;
-  color: var(--ink-dim); transition: opacity 0.6s ease;
-}
-.hint::before {
-  content: ""; width: 7px; height: 7px; border-radius: 50%;
-  border: 1.5px solid var(--corona);
-  animation: ping 1.8s ease-out infinite;
-}
-@keyframes ping {
-  0% { box-shadow: 0 0 0 0 rgba(255, 217, 163, 0.55); }
-  100% { box-shadow: 0 0 0 9px rgba(255, 217, 163, 0); }
-}
-.hint.done { opacity: 0; }
-
-/* ---------- hero: drag zone + title ---------- */
-.hero {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: clamp(300px, 46dvh, 560px);
-  display: flex;
-  align-items: flex-end;
-  padding-bottom: 6px;
-  touch-action: none;
-  cursor: grab;
-  -webkit-user-select: none;
-  user-select: none;
-  outline-offset: -2px;
-  border-radius: 22px;
-}
-.hero:focus-visible { outline: 2px solid var(--iris); }
-.dragging .hero { cursor: grabbing; }
-
-.title {
+.name {
   margin: 0;
-  color: var(--ink);
-  text-shadow: 0 2px 28px rgba(4, 5, 12, 0.55);
-  pointer-events: none;
   font-family: var(--display);
   font-weight: 800;
-  font-size: clamp(3.9rem, 22.5vw, 7rem);
+  font-size: clamp(3.4rem, min(22vw, 11.5dvh), 6.2rem);
   line-height: 0.9;
   letter-spacing: -0.045em;
+  animation: rise 0.7s cubic-bezier(0.16, 0.84, 0.24, 1) both;
 }
-.line { display: block; overflow: hidden; padding: 0.07em 0.04em 0.03em; margin: -0.07em -0.04em -0.03em; }
-.ch { display: inline-block; }
-
 .tagline {
-  margin: 14px 0 22px;
+  margin: 14px 0 0;
+  max-width: 28ch;
   color: var(--ink-dim);
   font-weight: 500;
   font-size: 1.0625rem;
+  animation: rise 0.7s cubic-bezier(0.16, 0.84, 0.24, 1) 0.08s both;
 }
+@keyframes rise { from { opacity: 0; translate: 0 16px; } to { opacity: 1; translate: 0 0; } }
 
-/* ---------- links ---------- */
-.links { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.row {
+/* ---------- buttons ---------- */
+.links { display: grid; gap: 12px; margin: 104px 0 0; padding: 0; list-style: none; }
+.links > li { position: relative; animation: rise 0.6s cubic-bezier(0.16, 0.84, 0.24, 1) both; animation-delay: calc(0.14s + var(--i) * 60ms); }
+
+.btn {
   appearance: none;
   position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 14px;
   width: 100%;
-  min-height: 60px;
+  min-height: 66px;
   margin: 0;
-  padding: 12px 18px;
-  border: 1px solid rgba(243, 239, 232, calc(0.12 + var(--glow) * 0.2));
-  border-radius: 18px;
-  background:
-    radial-gradient(170px 130px at var(--mx, -300px) var(--my, -300px), rgba(255, 226, 180, 0.2), transparent 70%),
-    var(--row);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 0 calc(var(--glow) * 32px) rgba(255, 205, 140, calc(var(--glow) * 0.17));
+  padding: 10px 18px 10px 10px;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035)), rgba(12, 12, 24, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 14px 30px -14px rgba(0, 0, 0, 0.8);
   color: var(--ink);
-  font: 700 1.0625rem/1.2 var(--text);
+  font: 700 1.125rem/1.2 var(--text);
   text-align: left;
   text-decoration: none;
   cursor: pointer;
   touch-action: manipulation;
-  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.3, 1), border-color 0.3s ease;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
-.row:active { transform: scale(0.982); }
-.row:focus-visible { outline: 2px solid var(--iris); outline-offset: 3px; }
-.row > span:first-child { flex: none; white-space: nowrap; }
+.btn > * { position: relative; z-index: 1; }
+/* spotlight: a bright rim and a soft glow that follow the finger */
+.btn::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: radial-gradient(150px 110px at var(--mx, -300px) var(--my, -300px), rgba(255, 255, 255, 0.85), transparent 65%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: var(--on, 0); transition: opacity 0.35s ease;
+}
+.btn::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(190px 130px at var(--mx, -300px) var(--my, -300px), var(--glow, rgba(255, 190, 215, 0.2)), transparent 70%);
+  opacity: var(--on, 0); transition: opacity 0.35s ease;
+}
+.btn:active { transform: scale(0.972); }
+.btn:focus-visible { outline: 2px solid var(--iris); outline-offset: 3px; }
+/* a single sheen sweeps each button as it settles in */
+.sheen {
+  position: absolute !important; inset: 0; z-index: 2 !important; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+  translate: -120% 0;
+  animation: sheen 1.1s ease-out both;
+  animation-delay: calc(0.5s + var(--i) * 90ms);
+}
+@keyframes sheen { to { translate: 120% 0; } }
+
+.tile {
+  flex: none; display: grid; place-items: center;
+  width: 46px; height: 46px; border-radius: 15px;
+  background: var(--tile);
+  color: #12101C;
+  font: 800 1.15rem/1 var(--display);
+  letter-spacing: -0.04em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.14);
+}
+.label { flex: none; white-space: nowrap; }
 .handle {
-  flex: 1 1 auto;
-  text-align: right;
-  min-width: 0;
+  flex: 1 1 auto; min-width: 0; text-align: right;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-weight: 500; font-size: 0.8125rem; color: var(--ink-faint);
+}
+
+/* ---------- the bunny ---------- */
+.bunny {
+  position: absolute; z-index: 0;
+  right: 18px; bottom: calc(100% - 1px);
+  width: 96px; height: 94px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 500;
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none; user-select: none;
 }
+.bunny svg { display: block; width: 96px; height: 94px; overflow: visible; }
+.bunny .rig {
+  transform-origin: 48px 94px;
+  animation: peek 0.9s cubic-bezier(0.2, 1.3, 0.35, 1) 0.55s both, bob 4.2s ease-in-out 1.5s infinite;
+}
+@keyframes peek { from { translate: 0 80px; } to { translate: 0 0; } }
+@keyframes bob { 50% { translate: 0 2px; } }
 
-/* ---------- loader ---------- */
-.loader { display: none; }
-.js .loader {
-  display: block;
-  position: fixed;
-  left: 18px;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  z-index: 5;
+.bunny .ear { transform-box: fill-box; transform-origin: 50% 100%; }
+.bunny .ear.l { animation: sway-l 3.4s ease-in-out infinite alternate; }
+.bunny .ear.r { animation: sway-r 4.1s ease-in-out infinite alternate; }
+@keyframes sway-l { to { rotate: -5deg; } }
+@keyframes sway-r { to { rotate: 4deg; } }
+.bunny .eye { transform-box: fill-box; transform-origin: 50% 50%; animation: blink 4.6s infinite; }
+@keyframes blink { 0%, 93%, 100% { scale: 1 1; } 96% { scale: 1 0.1; } }
+.bunny .look { translate: var(--lx, 0px) var(--ly, 0px); transition: translate 0.18s ease-out; }
+.bunny .happy-eye, .bunny .open-mouth { opacity: 0; }
+
+.bunny.excited .rig { animation: hop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+.bunny.excited .ear.l { animation: none; rotate: -9deg; }
+.bunny.excited .ear.r { animation: none; rotate: 9deg; }
+.bunny.excited .eye { opacity: 0; }
+.bunny.excited .happy-eye, .bunny.excited .open-mouth { opacity: 1; }
+.bunny.excited .closed-mouth { opacity: 0; }
+@keyframes hop { 0% { translate: 0 0; } 45% { translate: 0 -16px; } 100% { translate: 0 -6px; } }
+
+.paws { position: absolute; z-index: 3; right: 18px; bottom: calc(100% - 7px); width: 96px; height: 14px; pointer-events: none; }
+.paws svg { display: block; width: 96px; height: 14px; }
+
+.chip {
+  position: absolute; z-index: 4; right: 124px; bottom: calc(100% + 30px);
+  padding: 7px 12px; border-radius: 14px 14px 4px 14px;
+  background: var(--ink); color: #14121F;
+  font: 700 0.875rem/1.2 var(--text); white-space: nowrap;
   pointer-events: none;
-  transition: opacity 0.7s ease, translate 0.7s ease;
+  opacity: 0; scale: 0.6; transform-origin: 100% 100%;
+  transition: opacity 0.15s ease, scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.l-num {
-  font-family: var(--display); font-weight: 800;
-  font-size: clamp(2.8rem, 13.5vw, 4.2rem);
-  line-height: 0.9;
-  color: var(--ink);
-  display: flex;
-}
-.l-num .d { display: inline-block; width: 0.95em; text-align: center; }
-.l-num .d.dot { width: 0.34em; }
-.l-cap { margin-top: 8px; font-size: 0.8125rem; font-weight: 600; color: var(--ink-faint); }
-.l-skip {
-  position: fixed;
-  right: 18px;
-  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
-  font-size: 0.8125rem; font-weight: 600; color: var(--ink-faint);
-  opacity: 0; animation: fade-in 0.8s ease 0.9s forwards;
-}
-.js .l-skip { display: block; }
-.l-skip { display: none; }
-.ready .loader, .ready .l-skip { opacity: 0; translate: 0 -12px; animation: none; transition: opacity 0.6s ease, translate 0.6s ease; }
+.chip.show { opacity: 1; scale: 1; }
 
-/* ---------- reveal choreography (only when JS is running) ---------- */
-.js .top, .js .tagline, .js .row, .js .ch { opacity: 0; }
-.ready .top { animation: fade-in 0.9s ease 0.5s both; }
-.ready .tagline { animation: rise 0.9s cubic-bezier(0.16, 0.84, 0.24, 1) 0.75s both; }
-.ready .ch { animation: char-in 1.1s cubic-bezier(0.16, 0.84, 0.24, 1) both; animation-delay: calc(var(--i) * 55ms); }
-.ready .row { animation: rise 0.9s cubic-bezier(0.16, 0.84, 0.24, 1) both; animation-delay: calc(0.95s + var(--i) * 80ms); }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes rise { from { opacity: 0; translate: 0 22px; } to { opacity: 1; translate: 0 0; } }
-@keyframes char-in {
-  from { opacity: 0; transform: translateY(112%) rotate(4deg); filter: blur(10px); }
-  to { opacity: 1; transform: none; filter: blur(0); }
+.hearts { position: absolute; z-index: 4; right: 18px; bottom: calc(100% + 20px); width: 96px; height: 0; pointer-events: none; }
+.heart {
+  position: absolute; left: 44px; bottom: 0; width: 18px; height: 18px;
+  fill: var(--rose); filter: drop-shadow(0 0 8px rgba(255, 143, 177, 0.7));
+  opacity: 0;
+  animation: float-up var(--dur, 1.3s) cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes float-up {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.4) rotate(0deg); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx, 0px), -90px) scale(var(--s, 1)) rotate(var(--rot, 0deg)); }
 }
 
-/* ---------- WhatsApp sheet ---------- */
+/* ---------- WhatsApp chat sheet ---------- */
 dialog {
   margin: auto auto 0;
   width: min(100%, 520px);
   max-width: 100%;
-  padding: 30px 22px calc(22px + env(safe-area-inset-bottom, 0px));
+  padding: 24px 20px calc(20px + env(safe-area-inset-bottom, 0px));
   border: 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 26px 26px 0 0;
-  background: #0B0D1C;
+  background: #0C0D1C;
   color: var(--ink);
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
   translate: 0 0;
@@ -239,79 +261,108 @@ dialog::backdrop {
 }
 dialog:not([open])::backdrop { background: transparent; }
 @starting-style { dialog[open]::backdrop { background: transparent; } }
-dialog h2 {
-  margin: 0 0 1.4rem;
-  font: 700 1.3rem/1.3 var(--text);
-  text-wrap: balance;
+
+.who { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-weight: 700; }
+.who .tile { width: 38px; height: 38px; border-radius: 13px; font-size: 1rem; }
+.who small { display: block; font-weight: 500; font-size: 0.75rem; color: var(--ink-faint); }
+.chat { min-height: 96px; }
+.typing {
+  display: inline-flex; gap: 5px; padding: 14px 16px;
+  border-radius: 18px 18px 18px 6px; background: #1A1E36;
 }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: #8E94BC; animation: dot 1s ease-in-out infinite; }
+.typing i:nth-child(2) { animation-delay: 0.15s; }
+.typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes dot { 0%, 60%, 100% { translate: 0 0; opacity: 0.5; } 30% { translate: 0 -5px; opacity: 1; } }
+.msg {
+  display: none; max-width: 94%; margin: 0; padding: 13px 15px;
+  border-radius: 18px 18px 18px 6px; background: #1A1E36;
+  font: 600 1.0625rem/1.4 var(--text); text-wrap: pretty;
+  transform-origin: 0 100%;
+}
+.sheet.typed .typing { display: none; }
+.sheet.typed .msg { display: block; animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes pop { from { opacity: 0; scale: 0.7; } to { opacity: 1; scale: 1; } }
 .ok {
-  appearance: none;
-  width: 100%;
-  min-height: 54px;
-  border: 0;
-  border-radius: 16px;
-  background: var(--ink);
-  color: #0B0D1C;
-  font: 700 1.0625rem/1 var(--text);
-  cursor: pointer;
-  transition: transform 0.15s ease;
+  appearance: none; width: 100%; min-height: 54px; margin-top: 18px;
+  border: 0; border-radius: 16px; background: var(--ink); color: #0C0D1C;
+  font: 700 1.0625rem/1 var(--text); cursor: pointer; transition: transform 0.15s ease;
 }
 .ok:active { transform: scale(0.98); }
 .ok:focus-visible { outline: 2px solid var(--iris); outline-offset: 3px; }
 
 @media (max-height: 700px) {
-  .page { padding-block: 14px 16px; }
-  .hero { min-height: 270px; }
-  .row { min-height: 54px; padding-block: 9px; }
-  .links { gap: 8px; }
-  .tagline { margin: 10px 0 16px; }
+  .page { padding-block: 16px 18px; }
+  .btn { min-height: 58px; }
+  .tile { width: 40px; height: 40px; }
+  .links { gap: 9px; margin-top: 98px; }
+  .tagline { margin-top: 8px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js .top, .js .tagline, .js .row, .js .ch { opacity: 1; }
-  .ready .top, .ready .tagline, .ready .ch, .ready .row, .hint::before, .l-skip { animation: none; }
-  .row, .ok, dialog, dialog::backdrop, .hint { transition: none; }
+  .bg i, .bg .stars, .name, .tagline, .links > li, .sheen, .bunny .rig, .bunny .ear, .bunny .eye, .typing i { animation: none; }
+  .sheen { display: none; }
+  .btn, .chip, .bunny .look, dialog, dialog::backdrop, .ok { transition: none; }
+  .sheet .msg { animation: none; }
+  .heart { animation-duration: 0.01s; }
 }
 </style>
 <!--body-->
-<script>document.documentElement.classList.add("js");</script>
 
-<canvas id="gl" aria-hidden="true"></canvas>
-<div class="fb" id="fb" hidden aria-hidden="true"><div class="fb-sun"></div><div class="fb-moon" id="fb-moon"></div></div>
+<div class="bg" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i><i class="stars"></i></div>
 
-<main class="page" id="page">
-  <div class="top">
-    <p class="readout"><span>obscuration</span><span class="val" id="r-val">0.0%</span></p>
-    <p class="hint" id="hint">chand ko kheencho</p>
-  </div>
-
-  <section class="hero" id="hero" tabindex="0" aria-label="Eclipse. Drag to move the moon over the sun, or use the arrow keys.">
-    <h1 class="title" aria-label="aalsi billi">
-      <span class="line" aria-hidden="true"><span class="ch" style="--i:0">a</span><span class="ch" style="--i:1">a</span><span class="ch" style="--i:2">l</span><span class="ch" style="--i:3">s</span><span class="ch" style="--i:4">i</span></span>
-      <span class="line" aria-hidden="true"><span class="ch" style="--i:5">b</span><span class="ch" style="--i:6">i</span><span class="ch" style="--i:7">l</span><span class="ch" style="--i:8">l</span><span class="ch" style="--i:9">i</span></span>
-    </h1>
-  </section>
-
+<main class="page">
+  <h1 class="name">aalsi<br>billi</h1>
   <p class="tagline">kabhi dikhta hoon, kabhi nahi.</p>
 
   <ul class="links">
-    <li style="--i:0"><a class="row" href="https://www.instagram.com/someone_u_know_0_o/" target="_blank" rel="noopener noreferrer"><span>Instagram</span><span class="handle">@someone_u_know_0_o</span></a></li>
-    <li style="--i:1"><a class="row" href="https://www.snapchat.com/add/satyamkr0_0" target="_blank" rel="noopener noreferrer"><span>Snapchat</span><span class="handle">satyamkr0_0</span></a></li>
-    <li style="--i:2"><a class="row" href="https://github.com/satyam-64136" target="_blank" rel="noopener noreferrer"><span>GitHub</span><span class="handle">satyam-64136</span></a></li>
-    <li style="--i:3"><button class="row" id="wa-btn" type="button"><span>WhatsApp</span><span class="handle">number private</span></button></li>
-    <li style="--i:4"><a class="row" href="https://t.me/Someone_who_disappears" target="_blank" rel="noopener noreferrer"><span>Telegram</span><span class="handle">@Someone_who_disappears</span></a></li>
+    <li style="--i:0">
+      <div class="chip" id="chip" aria-hidden="true">yay! 💖</div>
+      <div class="hearts" id="hearts" aria-hidden="true"></div>
+      <div class="bunny" id="bunny" aria-hidden="true">
+        <svg viewBox="0 0 96 94" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="fur" cx="50%" cy="35%" r="75%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F4E6E0"/></radialGradient>
+            <linearGradient id="inner" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC4D4"/><stop offset="1" stop-color="#FF8FB1"/></linearGradient>
+            <radialGradient id="blush" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FF8FB1" stop-opacity=".75"/><stop offset="1" stop-color="#FF8FB1" stop-opacity="0"/></radialGradient>
+          </defs>
+          <g class="rig">
+            <g class="ear l"><ellipse cx="34" cy="25" rx="9" ry="25" fill="url(#fur)" transform="rotate(-8 34 46)"/><ellipse cx="34.5" cy="27" rx="4.8" ry="18" fill="url(#inner)" transform="rotate(-8 34 46)"/></g>
+            <g class="ear r"><ellipse cx="62" cy="25" rx="9" ry="25" fill="url(#fur)" transform="rotate(8 62 46)"/><ellipse cx="61.5" cy="27" rx="4.8" ry="18" fill="url(#inner)" transform="rotate(8 62 46)"/></g>
+            <ellipse cx="48" cy="66" rx="30" ry="26" fill="url(#fur)"/>
+            <circle cx="28.5" cy="72" r="8" fill="url(#blush)"/><circle cx="67.5" cy="72" r="8" fill="url(#blush)"/>
+            <g class="look">
+              <ellipse class="eye" cx="37.5" cy="64" rx="3.4" ry="4.5" fill="#2A1B2D"/>
+              <ellipse class="eye" cx="58.5" cy="64" rx="3.4" ry="4.5" fill="#2A1B2D"/>
+              <circle cx="38.7" cy="62.3" r="1.2" fill="#fff"/><circle cx="59.7" cy="62.3" r="1.2" fill="#fff"/>
+              <path class="happy-eye" d="M33.5 65 q4 -6 8 0" fill="none" stroke="#2A1B2D" stroke-width="2.2" stroke-linecap="round"/>
+              <path class="happy-eye" d="M54.5 65 q4 -6 8 0" fill="none" stroke="#2A1B2D" stroke-width="2.2" stroke-linecap="round"/>
+            </g>
+            <ellipse cx="48" cy="70" rx="3.2" ry="2.3" fill="#FF8FB1"/>
+            <path class="closed-mouth" d="M48 72.2 v2 M48 74.2 q-3.4 3.4 -6.4 .2 M48 74.2 q3.4 3.4 6.4 .2" fill="none" stroke="#C97B93" stroke-width="1.4" stroke-linecap="round"/>
+            <path class="open-mouth" d="M43.5 74 q4.5 8 9 0 z" fill="#E5738F"/>
+          </g>
+        </svg>
+      </div>
+      <a class="btn" id="ig" href="https://www.instagram.com/someone_u_know_0_o/" target="_blank" rel="noopener noreferrer" style="--tile:linear-gradient(135deg,#FF8FB1,#FFD9A3);--glow:rgba(255,150,190,.24)">
+        <span class="tile" aria-hidden="true">ig</span><span class="label">Instagram</span><span class="handle">@someone_u_know_0_o</span><span class="sheen" aria-hidden="true"></span>
+      </a>
+      <div class="paws" aria-hidden="true"><svg viewBox="0 0 96 14" xmlns="http://www.w3.org/2000/svg"><ellipse cx="31" cy="8" rx="9.5" ry="6" fill="#FFF6F1"/><ellipse cx="65" cy="8" rx="9.5" ry="6" fill="#FFF6F1"/><path d="M28 10 v-3 M31 10.5 v-3.5 M34 10 v-3 M62 10 v-3 M65 10.5 v-3.5 M68 10 v-3" stroke="#E7CFC8" stroke-width="1" stroke-linecap="round"/></svg></div>
+    </li>
+    <li style="--i:1"><a class="btn" href="https://www.snapchat.com/add/satyamkr0_0" target="_blank" rel="noopener noreferrer" style="--tile:linear-gradient(135deg,#FFE66B,#FFC83D);--glow:rgba(255,220,110,.2)"><span class="tile" aria-hidden="true">sc</span><span class="label">Snapchat</span><span class="handle">satyamkr0_0</span><span class="sheen" aria-hidden="true"></span></a></li>
+    <li style="--i:2"><a class="btn" href="https://github.com/satyam-64136" target="_blank" rel="noopener noreferrer" style="--tile:linear-gradient(135deg,#B3A5FF,#7F68F5);--glow:rgba(150,130,255,.24)"><span class="tile" aria-hidden="true">gh</span><span class="label">GitHub</span><span class="handle">satyam-64136</span><span class="sheen" aria-hidden="true"></span></a></li>
+    <li style="--i:3"><button class="btn" id="wa-btn" type="button" style="--tile:linear-gradient(135deg,#7BF2B8,#2FC98A);--glow:rgba(110,240,180,.2)"><span class="tile" aria-hidden="true">wa</span><span class="label">WhatsApp</span><span class="handle">number private</span><span class="sheen" aria-hidden="true"></span></button></li>
+    <li style="--i:4"><a class="btn" href="https://t.me/Someone_who_disappears" target="_blank" rel="noopener noreferrer" style="--tile:linear-gradient(135deg,#8EDCFF,#3CA8F2);--glow:rgba(110,200,255,.22)"><span class="tile" aria-hidden="true">tg</span><span class="label">Telegram</span><span class="handle">@Someone_who_disappears</span><span class="sheen" aria-hidden="true"></span></a></li>
   </ul>
-
-  <div class="loader" id="loader" aria-hidden="true">
-    <div class="l-num" id="l-num"></div>
-    <div class="l-cap">obscuration</div>
-  </div>
-  <div class="l-skip" id="skip" aria-hidden="true">tap to skip</div>
 </main>
 
-<dialog id="wa-dialog" closedby="any" aria-labelledby="wa-title">
+<dialog id="wa-dialog" class="sheet" closedby="any" aria-labelledby="wa-title">
   <form method="dialog">
-    <h2 id="wa-title">Number public krne se already fielding lg chuki hai firse nhi krunga😔💪</h2>
+    <div class="who"><span class="tile" style="--tile:linear-gradient(135deg,#7BF2B8,#2FC98A)" aria-hidden="true">wa</span><div>WhatsApp<small>aalsi billi</small></div></div>
+    <div class="chat" aria-live="polite">
+      <div class="typing" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="msg" id="wa-title">Number public krne se already fielding lg chuki hai firse nhi krunga😔💪</p>
+    </div>
     <button class="ok" type="submit" value="ok">Theek hai</button>
   </form>
 </dialog>
@@ -320,289 +371,95 @@ dialog h2 {
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const root = document.documentElement;
-  const page = $("page"), hero = $("hero"), canvas = $("gl"), fb = $("fb"), fbMoon = $("fb-moon");
-  const rVal = $("r-val"), lNum = $("l-num"), hint = $("hint");
+  const bunny = $("bunny"), hearts = $("hearts"), chip = $("chip"), ig = $("ig");
   const dlg = $("wa-dialog"), waBtn = $("wa-btn");
   const reduceMQ = matchMedia("(prefers-reduced-motion: reduce)");
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const buzz = (p) => { try { navigator.vibrate && navigator.vibrate(p); } catch (_) {} };
 
-  /* ---------- failsafe: the page must never stay hidden ---------- */
-  const failsafe = setTimeout(() => page.classList.add("ready"), 7000);
-
-  /* ---------- eclipse geometry (shared by shader and JS) ---------- */
-  const RS = 0.20, RM = 0.207;
-  const coverage = (x, y) => {
-    const t = clamp((Math.hypot(x, y) - (RM - RS)) / (2 * RS), 0, 1);
-    return 1 - t * t * (3 - 2 * t);
-  };
-
-  /* ---------- shader ---------- */
-  const VERT = "attribute vec2 a;void main(){gl_Position=vec4(a,0.0,1.0);}";
-  const FRAG = `
-#ifdef GL_FRAGMENT_PRECISION_HIGH
-precision highp float;
-#else
-precision mediump float;
-#endif
-uniform vec2 uRes; uniform float uTime; uniform vec2 uSun; uniform float uUnit;
-uniform vec2 uMoon; uniform float uCov; uniform float uFlash; uniform float uFade; uniform vec2 uTilt;
-
-float h21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
-float vn(vec2 p){
-  vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
-  return mix(mix(h21(i),h21(i+vec2(1.0,0.0)),f.x), mix(h21(i+vec2(0.0,1.0)),h21(i+vec2(1.0,1.0)),f.x), f.y);
-}
-float fbm3(vec2 p){ float v=0.0,a=0.5; for(int i=0;i<3;i++){ v+=a*vn(p); p=p*2.03+vec2(7.1,3.7); a*=0.5; } return v; }
-vec3 pal(float t){ return 0.5+0.5*cos(6.28318*(vec3(t)+vec3(0.0,0.33,0.67))); }
-
-vec3 starLayer(vec2 uv,float cells,float seed){
-  vec2 g=uv*cells; vec2 id=floor(g); vec2 f=fract(g)-0.5;
-  float h=h21(id+seed);
-  vec2 off=(vec2(h21(id+seed+1.7),h21(id+seed+9.2))-0.5)*0.6;
-  float d=length(f-off);
-  float tw=0.65+0.35*sin(uTime*(0.8+h*2.5)+h*60.0);
-  float sz=mix(0.03,0.085,h21(id+seed+3.3));
-  float m=step(0.84,h)*(1.0-smoothstep(0.0,sz,d))*tw;
-  vec3 tint=mix(vec3(0.75,0.85,1.0),vec3(1.0,0.86,0.72),h21(id+seed+5.1));
-  return tint*m*(0.45+0.9*h21(id+seed+8.8));
-}
-
-void main(){
-  vec2 frag=gl_FragCoord.xy;
-  vec2 p=(frag-uSun)/uUnit;
-  vec2 uv=(frag-0.5*uRes)/min(uRes.x,uRes.y);
-  float r=length(p);
-  float Rs=${RS.toFixed(3)}; float Rm=${RM.toFixed(3)};
-  float cov=uCov;
-  float cm=smoothstep(0.5,1.0,cov);
-  float sunLight=1.0-0.9*cov*cov;
-
-  vec3 col=vec3(0.010,0.013,0.030);
-  float neb=fbm3(uv*1.7+vec2(uTime*0.006,-uTime*0.004));
-  col+=vec3(0.035,0.030,0.090)*smoothstep(0.3,0.9,neb)*(0.6+0.4*cm);
-  col+=vec3(0.015,0.025,0.060)*exp(-r*1.2)*sunLight;
-
-  vec2 su=uv+uTilt*0.015;
-  float glare=1.0-0.85*exp(-r*2.6)*sunLight;
-  col+=(starLayer(su,26.0,1.0)+0.7*starLayer(su+3.7,46.0,7.0))*glare;
-
-  float dsun=r-Rs;
-  float ro=max(dsun,0.0);
-  float disc=1.0-smoothstep(-0.004,0.004,dsun);
-  float limb=sqrt(max(0.0,1.0-(r*r)/(Rs*Rs)));
-  vec3 sunCol=mix(vec3(1.0,0.55,0.22),vec3(1.0,0.96,0.88),pow(limb,0.6));
-  float halo=exp(-ro*8.0)*0.55+exp(-ro*26.0)*1.0+exp(-ro*3.0)*0.18;
-  col+=vec3(1.0,0.78,0.5)*halo*sunLight*0.5;
-  col=mix(col,sunCol*2.2,disc);
-
-  if(cm>0.002 && ro<0.9){
-    vec2 dir=p/max(r,0.0001);
-    float n1=fbm3(dir*2.2+vec2(ro*2.4,ro*1.1)+uTime*0.03);
-    float n2=fbm3(dir*5.5+vec2(ro*1.6,-ro*1.4)-uTime*0.045);
-    float rays=pow(clamp(n1*1.25,0.0,1.0),2.2)*0.9+pow(n2,2.5)*0.9;
-    float cor=(0.28+1.35*rays)*exp(-ro*4.2)+exp(-ro*14.0)*1.1;
-    vec3 cc=mix(vec3(1.0,0.92,0.78),vec3(0.50,0.62,1.0),smoothstep(0.02,0.5,ro));
-    cc+=pal(ro*1.6+uTime*0.03)*0.12*smoothstep(0.1,0.5,ro);
-    col+=cc*cor*cm*1.25;
-  }
-
-  vec2 pm=p-uMoon;
-  float dmoon=length(pm)-Rm;
-  float moonMask=1.0-smoothstep(-0.004,0.004,dmoon);
-  vec3 moonCol=vec3(0.008,0.010,0.020)+vec3(0.03,0.035,0.07)*fbm3(pm*10.0)*0.5;
-  vec3 rim=pal(atan(pm.y,pm.x)/6.28318+uTime*0.04)*(1.0-smoothstep(0.0,0.02,abs(dmoon+0.006)))*0.35*(0.25+cm);
-  col=mix(col,moonCol+rim,moonMask);
-  col+=vec3(1.0,0.82,0.58)*exp(-max(dmoon,0.0)*70.0)*0.18*cm*(1.0-moonMask);
-
-  float u=1.0-cov;
-  float dw=smoothstep(0.0,0.015,u)*(1.0-smoothstep(0.015,0.14,u));
-  vec2 dp=-normalize(uMoon+vec2(0.0001,0.0))*Rs;
-  float dd=length(p-dp);
-  float diamond=exp(-dd*48.0)*1.8+exp(-dd*140.0)*3.0;
-  float flare=exp(-abs(p.y-dp.y)*70.0)*exp(-abs(p.x-dp.x)*4.5)*0.9;
-  col+=(vec3(1.0,0.95,0.85)*diamond+vec3(0.55,0.70,1.0)*flare)*dw*(1.0-moonMask);
-
-  col+=vec3(1.0,0.93,0.82)*uFlash*(exp(-r*2.2)+0.15);
-
-  col*=0.2+0.8*smoothstep(0.40,0.80,frag.y/uRes.y);
-  col*=1.0-0.5*dot(uv*0.9,uv*0.9);
-  col=1.0-exp(-col*1.35);
-  col+=(h21(frag+fract(uTime)*91.7)-0.5)*0.03;
-  col*=uFade;
-  gl_FragColor=vec4(col,1.0);
-}`;
-
-  /* ---------- state ---------- */
-  const moon = { x: 0.8, y: -0.45 };
-  const P0 = { x: 0.8, y: -0.45 };
-  const drag = { active: false, id: -1, ux: 0, uy: 0 };
-  const keys = { x: 0, y: 0 };
-  const tilt = { x: 0, y: 0, tx: 0, ty: 0 };
-  let phase = "loading", tl = 0, skip = false, flash = 0, fade = 0;
-  let time = 0, readyAt = 0, last = performance.now(), lastReadout = 0, lastGlow = -1;
-  let inTotality = false, wasAway = false, dragged = false;
-  let scale = 1, quality = 0.85, emaDt = 0.016, lastAdapt = 0;
-  let cssSun = { x: 0, y: 0 }, cssUnit = 400, sunPx = { x: 0, y: 0 }, unitPx = 400;
-  let gl = null, U = {}, useFallback = false;
-  const INTRO = reduceMQ.matches ? 0 : 3000;
-
-  /* ---------- loader counter: fixed-width cells so digits never jitter ---------- */
-  function setCounter(str) {
-    if (lNum.childNodes.length !== str.length) {
-      lNum.textContent = "";
-      for (let i = 0; i < str.length; i++) {
-        const s = document.createElement("span");
-        s.className = str[i] === "." ? "d dot" : "d";
-        lNum.appendChild(s);
-      }
-    }
-    for (let i = 0; i < str.length; i++) lNum.childNodes[i].textContent = str[i];
-  }
-  setCounter("000.0");
-
-  /* ---------- GL ---------- */
-  function initGL() {
-    try {
-      gl = canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "high-performance" }) ||
-           canvas.getContext("experimental-webgl");
-    } catch (_) { gl = null; }
-    if (!gl) return false;
-    const mk = (type, src) => {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src); gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn(gl.getShaderInfoLog(s)); return null; }
-      return s;
-    };
-    const vs = mk(gl.VERTEX_SHADER, VERT), fs = mk(gl.FRAGMENT_SHADER, FRAG);
-    if (!vs || !fs) return false;
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.warn(gl.getProgramInfoLog(prog)); return false; }
-    gl.useProgram(prog);
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, "a");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    ["uRes", "uTime", "uSun", "uUnit", "uMoon", "uCov", "uFlash", "uFade", "uTilt"].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
-    canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); gl = null; enableFallback(); });
-    return true;
-  }
-
-  function enableFallback() {
-    useFallback = true;
-    canvas.style.display = "none";
-    fb.hidden = false;
-    layout();
-  }
-
-  /* ---------- layout ---------- */
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    scale = dpr * quality;
-    if (gl) {
-      canvas.width = Math.max(2, Math.round(innerWidth * scale));
-      canvas.height = Math.max(2, Math.round(innerHeight * scale));
-      gl.viewport(0, 0, canvas.width, canvas.height);
-    }
-    layout();
-  }
-  function layout() {
-    const r = hero.getBoundingClientRect();
-    cssSun = { x: r.left + r.width / 2, y: r.top + r.height * 0.34 };
-    cssUnit = Math.min(innerWidth * 0.98, r.height * 1.05, 600);
-    sunPx = { x: cssSun.x * scale, y: (gl ? canvas.height : innerHeight * scale) - cssSun.y * scale };
-    unitPx = cssUnit * scale;
-    fb.style.setProperty("--sx", cssSun.x + "px");
-    fb.style.setProperty("--sy", cssSun.y + "px");
-    fb.style.setProperty("--u", cssUnit + "px");
-    // when everything fits on one screen the hero can take over touch; otherwise keep vertical scrolling
-    const fits = root.scrollHeight <= innerHeight + 2;
-    hero.style.touchAction = fits ? "none" : "pan-y pinch-zoom";
-  }
-
-  /* ---------- input ---------- */
-  const DOE = window.DeviceOrientationEvent;
-  const needsPerm = !!(DOE && typeof DOE.requestPermission === "function");
-  let tiltOn = false;
-  function onOrient(e) {
-    if (e.gamma == null || reduceMQ.matches) return;
-    tilt.tx = clamp(e.gamma / 28, -1, 1);
-    tilt.ty = clamp(((e.beta == null ? 50 : e.beta) - 50) / 28, -1, 1);
-  }
-  function listenTilt() { if (!tiltOn) { tiltOn = true; addEventListener("deviceorientation", onOrient, { passive: true }); } }
-  function askTilt() {
-    if (tiltOn || reduceMQ.matches) return;
-    if (!needsPerm) { listenTilt(); return; }
-    DOE.requestPermission().then((r) => { if (r === "granted") listenTilt(); }).catch(() => {});
-  }
-  if (!needsPerm) listenTilt();
-
-  function setDrag(e) {
-    const off = e.pointerType === "touch" ? 60 : 0;   // keep the moon above the fingertip
-    let ux = (e.clientX - cssSun.x) / cssUnit;
-    let uy = -((e.clientY - off) - cssSun.y) / cssUnit;
-    const m = Math.hypot(ux, uy);
-    if (m > 1.15) { ux *= 1.15 / m; uy *= 1.15 / m; }
-    drag.ux = ux; drag.uy = uy;
-  }
-  hero.addEventListener("pointerdown", (e) => {
-    if (phase !== "ready") return;
-    drag.active = true; drag.id = e.pointerId;
-    try { hero.setPointerCapture(e.pointerId); } catch (_) {}
-    setDrag(e);
-    root.classList.add("dragging");
-    hint.classList.add("done");
-    dragged = true;
-    askTilt();
-  });
-  hero.addEventListener("pointermove", (e) => { if (drag.active && e.pointerId === drag.id) setDrag(e); });
-  const endDrag = (e) => {
-    if (e.pointerId !== drag.id) return;
-    drag.active = false; drag.id = -1;
-    root.classList.remove("dragging");
-  };
-  hero.addEventListener("pointerup", endDrag);
-  hero.addEventListener("pointercancel", endDrag);
-  hero.addEventListener("lostpointercapture", endDrag);
-
-  addEventListener("pointermove", (e) => {
-    if (e.pointerType === "mouse" && !reduceMQ.matches) {
-      tilt.tx = clamp((e.clientX / innerWidth) * 2 - 1, -1, 1) * 0.8;
-      tilt.ty = -clamp((e.clientY / innerHeight) * 2 - 1, -1, 1) * 0.6;
-    }
-  }, { passive: true });
-  addEventListener("pointerdown", () => { if (phase === "loading") skip = true; }, { passive: true });
-
-  hero.addEventListener("keydown", (e) => {
-    const k = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
-    if (!k) return;
-    e.preventDefault();
-    keys.x = k[0] * 0.2; keys.y = k[1] * 0.2;
-    hint.classList.add("done");
-  });
-  hero.addEventListener("keyup", () => { keys.x = 0; keys.y = 0; });
-  hero.addEventListener("blur", () => { keys.x = 0; keys.y = 0; });
-
-  /* link rows: spotlight follows the finger, and the eclipse reacts to a press */
-  document.querySelectorAll(".row").forEach((el) => {
-    const spot = (e) => {
+  /* ---------- buttons: a spotlight that follows the finger ---------- */
+  document.querySelectorAll(".btn").forEach((el) => {
+    let off = 0;
+    const aim = (e) => {
       const r = el.getBoundingClientRect();
       el.style.setProperty("--mx", (e.clientX - r.left) + "px");
       el.style.setProperty("--my", (e.clientY - r.top) + "px");
     };
-    el.addEventListener("pointerdown", (e) => { spot(e); flash = Math.max(flash, 0.22); });
-    el.addEventListener("pointermove", spot);
-    el.addEventListener("pointerleave", () => { el.style.removeProperty("--mx"); el.style.removeProperty("--my"); });
+    const on = (e) => { clearTimeout(off); aim(e); el.style.setProperty("--on", "1"); };
+    const out = (delay) => { clearTimeout(off); off = setTimeout(() => el.style.setProperty("--on", "0"), delay); };
+    el.addEventListener("pointerenter", on);
+    el.addEventListener("pointermove", (e) => { aim(e); });
+    el.addEventListener("pointerdown", (e) => { on(e); buzz(8); });
+    el.addEventListener("pointerup", () => out(260));
+    el.addEventListener("pointerleave", () => out(0));
+    el.addEventListener("pointercancel", () => out(0));
   });
 
-  /* ---------- WhatsApp sheet ---------- */
-  waBtn.addEventListener("click", () => {
-    flash = Math.max(flash, 0.3);
-    if (typeof dlg.showModal === "function") dlg.showModal();
+  /* ---------- bunny ---------- */
+  const lines = ["hehe 💖", "follow karo na 🥺", "pls pls 🥺", "yaaay! ✨", "aur dabao 😳"];
+  let tapCount = 0, calmTimer = 0, chipTimer = 0;
+
+  function spawnHearts(n) {
+    if (reduceMQ.matches) return;
+    for (let i = 0; i < n; i++) {
+      const h = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      h.setAttribute("viewBox", "0 0 24 24");
+      h.setAttribute("class", "heart");
+      h.innerHTML = '<path d="M12 21s-7-4.4-9.3-8.6C1 9.2 2.6 5.5 6 5.5c2 0 3.3 1.1 4 2.3.7-1.2 2-2.3 4-2.3 3.4 0 5 3.7 3.3 6.9C19 16.6 12 21 12 21z"/>';
+      h.style.setProperty("--dx", ((Math.random() - 0.5) * 90).toFixed(0) + "px");
+      h.style.setProperty("--rot", ((Math.random() - 0.5) * 50).toFixed(0) + "deg");
+      h.style.setProperty("--s", (0.7 + Math.random() * 0.9).toFixed(2));
+      h.style.setProperty("--dur", (1 + Math.random() * 0.7).toFixed(2) + "s");
+      h.style.animationDelay = (i * 60) + "ms";
+      h.addEventListener("animationend", () => h.remove());
+      hearts.appendChild(h);
+    }
+  }
+  function say(text, ms) {
+    chip.textContent = text;
+    chip.classList.add("show");
+    clearTimeout(chipTimer);
+    chipTimer = setTimeout(() => chip.classList.remove("show"), ms);
+  }
+  function cheer(text, count) {
+    bunny.classList.remove("excited");
+    void bunny.offsetWidth;           // restart the hop
+    bunny.classList.add("excited");
+    spawnHearts(count);
+    say(text, 1300);
+    clearTimeout(calmTimer);
+    calmTimer = setTimeout(() => bunny.classList.remove("excited"), 1250);
+  }
+  bunny.addEventListener("pointerdown", () => {
+    cheer(lines[tapCount % lines.length], 6);
+    tapCount += 1;
+    buzz([10, 40, 10]);
   });
+  // pressing the Instagram button makes the bunny celebrate straight away
+  ig.addEventListener("pointerdown", () => { cheer("yay! 💖", 9); buzz([12, 40, 12]); });
+  ig.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") cheer("yay! 💖", 6); });
+
+  // the bunny looks at your finger
+  const look = (x, y) => {
+    const r = bunny.getBoundingClientRect();
+    const dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height * 0.7);
+    const d = Math.max(1, Math.hypot(dx, dy));
+    const k = Math.min(1, d / 160) * 2.4;
+    bunny.style.setProperty("--lx", (dx / d * k).toFixed(2) + "px");
+    bunny.style.setProperty("--ly", (dy / d * k * 0.8).toFixed(2) + "px");
+  };
+  addEventListener("pointermove", (e) => look(e.clientX, e.clientY), { passive: true });
+  addEventListener("pointerdown", (e) => look(e.clientX, e.clientY), { passive: true });
+
+  /* ---------- WhatsApp sheet: typing dots, then the message ---------- */
+  let typed = 0;
+  waBtn.addEventListener("click", () => {
+    clearTimeout(typed);
+    dlg.classList.remove("typed");
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    typed = setTimeout(() => dlg.classList.add("typed"), reduceMQ.matches ? 0 : 750);
+  });
+  dlg.addEventListener("close", () => clearTimeout(typed));
   if (!("closedBy" in HTMLDialogElement.prototype)) {
     dlg.addEventListener("click", (event) => {
       if (event.target !== dlg) return;
@@ -611,108 +468,6 @@ void main(){
                      r.left <= event.clientX && event.clientX <= r.left + r.width;
       if (!inside) dlg.close();
     });
-  }
-
-  /* ---------- timeline ---------- */
-  function finishIntro() {
-    phase = "ready";
-    readyAt = time;
-    flash = 1;
-    clearTimeout(failsafe);
-    page.classList.add("ready");
-    root.classList.add("ready");
-  }
-
-  function frame(now) {
-    requestAnimationFrame(frame);
-    if (document.hidden) { last = now; return; }
-    const dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
-    last = now; time += dt;
-    const reduce = reduceMQ.matches;
-
-    fade = clamp(time / 0.8, 0, 1);
-    fade = fade * fade * (3 - 2 * fade);
-
-    if (phase === "loading") {
-      tl += INTRO > 0 ? (dt * 1000 / INTRO) * (skip ? 4 : 1) : 1;
-      const k = clamp(tl, 0, 1);
-      const e = 1 - Math.pow(1 - k, 1.8);
-      moon.x = P0.x * (1 - e);
-      moon.y = P0.y * (1 - e) + Math.sin(e * Math.PI) * 0.1;
-      if (tl >= 1) { moon.x = 0; moon.y = 0; finishIntro(); }
-    } else {
-      const ramp = reduce ? 0 : clamp((time - readyAt) / 1.6, 0, 1);
-      const ox = Math.cos(time * 0.35) * 0.05 * ramp, oy = Math.sin(time * 0.27) * 0.035 * ramp;
-      tilt.x += (tilt.tx - tilt.x) * (1 - Math.exp(-dt * 6));
-      tilt.y += (tilt.ty - tilt.y) * (1 - Math.exp(-dt * 6));
-      let tx, ty, kk;
-      if (drag.active) { tx = drag.ux; ty = drag.uy; kk = 14; }
-      else { tx = ox + keys.x + tilt.x * 0.06; ty = oy + keys.y - tilt.y * 0.04; kk = (keys.x || keys.y) ? 10 : 2.6; }
-      const f = reduce && !drag.active && !keys.x && !keys.y ? 1 : 1 - Math.exp(-dt * kk);
-      moon.x += (tx - moon.x) * f;
-      moon.y += (ty - moon.y) * f;
-    }
-
-    const cov = coverage(moon.x, moon.y);
-
-    // totality moments: when the moon glides back after being pulled away
-    if (cov < 0.6) wasAway = true;
-    if (cov > 0.985 && !inTotality) {
-      inTotality = true;
-      if (wasAway && phase === "ready") {
-        wasAway = false;
-        flash = Math.max(flash, 0.6);
-        try { navigator.vibrate && navigator.vibrate(14); } catch (_) {}
-      }
-    } else if (cov < 0.9) inTotality = false;
-    flash *= Math.exp(-dt * 3.2);
-    if (flash < 0.003) flash = 0;
-
-    // readouts
-    if (now - lastReadout > 50 || phase === "loading") {
-      lastReadout = now;
-      const s = (cov * 100).toFixed(1);
-      if (phase === "loading") setCounter(s.padStart(5, "0"));
-      rVal.textContent = s + "%";
-    }
-    const g = Math.round(Math.pow(cov, 3) * 50) / 50;
-    if (g !== lastGlow) { lastGlow = g; root.style.setProperty("--glow", g); }
-
-    // adaptive resolution: protect low-end phones
-    emaDt += (dt - emaDt) * 0.05;
-    if (gl && time - lastAdapt > 1.2 && time > 2 && emaDt > 0.028 && quality > 0.5) {
-      quality = Math.max(0.5, quality * 0.82); lastAdapt = time; resize();
-    }
-
-    if (gl) {
-      gl.uniform2f(U.uRes, canvas.width, canvas.height);
-      gl.uniform1f(U.uTime, time % 900);
-      gl.uniform2f(U.uSun, sunPx.x, sunPx.y);
-      gl.uniform1f(U.uUnit, unitPx);
-      gl.uniform2f(U.uMoon, moon.x, moon.y);
-      gl.uniform1f(U.uCov, cov);
-      gl.uniform1f(U.uFlash, flash);
-      gl.uniform1f(U.uFade, fade);
-      gl.uniform2f(U.uTilt, tilt.x, tilt.y);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    } else if (useFallback) {
-      fbMoon.style.transform = "translate(" + (moon.x * cssUnit).toFixed(1) + "px," + (-moon.y * cssUnit).toFixed(1) + "px)";
-    }
-  }
-
-  /* ---------- boot ---------- */
-  try {
-    if (!initGL()) { gl = null; enableFallback(); }
-    resize();
-    addEventListener("resize", resize);
-    addEventListener("scroll", layout, { passive: true });
-    if (window.ResizeObserver) new ResizeObserver(layout).observe(hero);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
-    requestAnimationFrame((n) => { last = n; frame(n); });
-  } catch (err) {
-    console.warn(err);
-    page.classList.add("ready");
-    root.classList.add("ready");
   }
 })();
 </script>
